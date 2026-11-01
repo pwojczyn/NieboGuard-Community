@@ -39,6 +39,18 @@ node --test tests/*.test.mjs
 SDK JavaScript nie ma zależności produkcyjnych. SDK Python korzysta wyłącznie
 ze standardowej biblioteki. Narzędzie vision opcjonalnie wymaga Pillow.
 
+## Testowy APK
+
+W [`releases/`](releases/README.md) jest wyłącznie testowy build NieboGuard:
+
+- `nieboguard-mobile-0.1.0-dev-debug.apk`,
+- podpis debug, nie release,
+- SHA-256 w [`releases/SHA256SUMS`](releases/SHA256SUMS).
+
+To jedyny plik APK w tym repozytorium. Nie ma tu `Straznik.apk` ani innych
+binarek. APK nie zawiera sekretów serwerowych; szczegóły w
+[`releases/APK-NOTICE.md`](releases/APK-NOTICE.md).
+
 ## Publiczne API
 
 - dokumentacja: [`docs/api/README.md`](docs/api/README.md)
