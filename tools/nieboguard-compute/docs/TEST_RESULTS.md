@@ -21,8 +21,11 @@ Zakres:
 - konfiguracja: uprawnienia 0600, redakcja tokenu, HTTPS, kompletność danych,
 - lokalny agent: status, stop/resume, odmowa startu bez rejestracji, blokada
   obcego Origin, preflight CORS, start/stop z zamockowanym procesem,
-- Audio AI: WAV → cechy, trening CPU, checkpoint i wznowienie,
-- Vision AI: głowa detekcji CPU, objectness F1 ≥ 0.8, eksport safetensors.
+- Audio AI: WAV → cechy, trening CPU, checkpoint i wznowienie, split z manifestu,
+  base artifact, stop bez uploadu,
+- Vision AI: głowa detekcji CPU, objectness F1 ≥ 0.8, eksport safetensors,
+- canonical JSON dla `1e-5`/`1e-6`/`1e-7`/`1e20`/`1e21`,
+- limit danych bez paczki i dozwolone klasy paczek.
 
 ## Instalator Linux
 
