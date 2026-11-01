@@ -4,6 +4,7 @@
   i statusy źródeł akademickich.
 - [`DATA_PACKS.md`](DATA_PACKS.md) — MINI/STANDARD/EXTENDED/GPU, deduplikacja,
   przydział i split po sesjach.
+- [`MODELS.md`](MODELS.md) — audyt modeli Audio AI/Vision AI i ograniczenia YAMNet.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — przepływ klient/backend, granice.
 - [`PUBLIC_SECURITY.md`](PUBLIC_SECURITY.md) — bezpieczeństwo, prywatność,
   capability URL i znane ograniczenia.
