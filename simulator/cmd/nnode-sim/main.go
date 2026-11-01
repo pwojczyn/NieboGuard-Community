@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/pwojczyn/NieboGuard-Community/simulator/internal/api"
 	"github.com/pwojczyn/NieboGuard-Community/simulator/internal/sim"
-	"github.com/pwojczyn/NieboGuard-Community/simulator/pkg/models"
 )
 
 func main() {
@@ -80,4 +80,3 @@ func main() {
 	logger.Info("simulator stopped")
 }
 
-var _ = models.SimulatedObservation{}

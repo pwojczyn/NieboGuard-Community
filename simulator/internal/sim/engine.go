@@ -2,7 +2,6 @@ package sim
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/pwojczyn/NieboGuard-Community/simulator/pkg/models"
