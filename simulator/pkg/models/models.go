@@ -2,6 +2,29 @@ package models
 
 import "time"
 
+// AircraftEvent is the unified observation model for all protocols.
+type AircraftEvent struct {
+	SourceID       string    `json:"source_id"`
+	SourceType     string    `json:"source_type"`
+	ObservationID  string    `json:"observation_id"`
+	ObjectType     string    `json:"object_type"`
+	Hex            string    `json:"hex,omitempty"`
+	Flight         string    `json:"flight,omitempty"`
+	Track          float64   `json:"track,omitempty"`
+	Lat            float64   `json:"lat,omitempty"`
+	Lon            float64   `json:"lon,omitempty"`
+	AltM           float64   `json:"alt_m,omitempty"`
+	Gs             float64   `json:"gs,omitempty"`
+	HeadingDeg     float64   `json:"heading_deg,omitempty"`
+	ObservedAt     time.Time `json:"observed_at"`
+	ReceivedAt     time.Time `json:"received_at"`
+	Quality        float64   `json:"quality,omitempty"`
+	Verified       bool      `json:"verified"`
+	Synthetic      bool      `json:"synthetic"`
+	SimulationNote string    `json:"simulation_note"`
+	Seen           float64   `json:"seen,omitempty"`
+}
+
 // SimulatedObservation represents a simulated/synthetic aircraft observation.
 // All fields are marked synthetic=true to distinguish from real measurements.
 type SimulatedObservation struct {
@@ -23,6 +46,7 @@ type SimulatedObservation struct {
 	Verified       bool      `json:"verified"`
 	Synthetic      bool      `json:"synthetic"`
 	SimulationNote string    `json:"simulation_note"`
+	Seen           float64   `json:"seen,omitempty"`
 }
 
 // SimulatedTrack represents a tracked object trajectory

@@ -23,6 +23,10 @@ type Link16Simulator struct {
 	RateHz        int
 }
 
+func randFloat64(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
+
 // NewLink16Simulator creates a new Link 16 simulator instance.
 func NewLink16Simulator(sourceID string) *Link16Simulator {
 	return &Link16Simulator{
@@ -41,24 +45,16 @@ func NewLink16Simulator(sourceID string) *Link16Simulator {
 
 // GenerateTrack returns a synthetic Link 16 track object.
 func (s *Link16Simulator) GenerateTrack() (*models.AircraftEvent, error) {
-	// Generate random values within specified ranges
 	lat := randFloat64(-0.5, 0.5) + 52.0 // Poland region
 	lon := randFloat64(-0.5, 0.5) + 19.0  // Poland region
 	alt := rand.Intn(s.MaxAlt-s.MinAlt) + s.MinAlt
 	speed := rand.Intn(s.MaxSpeed-s.MinSpeed) + s.MinSpeed
-	heading := rand.Intn(360)
+	heading := float64(rand.Intn(360))
 
-	// Generate synthetic track ID (SIM-XXXXX format)
-	trackID := fmt.Sprintf("SIM-%05d", rand.Intn(100000))
-
-	// Generate timestamp
-	timestamp := time.Now().UTC().Format(time.RFC3339)
-
-	// Create AircraftEvent with all required fields
 	event := &models.AircraftEvent{
 		SourceID:      s.SourceID,
 		SourceType:    "sim-link16",
-		ObservationID: fmt.Sprintf("link16-obs-%d", time.Now().Unix()),
+		ObservationID: fmt.Sprintf("link16-obs-%d", time.Now().UnixNano()),
 		ObjectType:    "aircraft",
 		Hex:           fmt.Sprintf("SIM%04X", rand.Intn(10000)),
 		Flight:        fmt.Sprintf("LINK16-SIM-%03d", rand.Intn(100)),
@@ -66,7 +62,8 @@ func (s *Link16Simulator) GenerateTrack() (*models.AircraftEvent, error) {
 		Lon:           lon,
 		AltM:          float64(alt),
 		Gs:            float64(speed),
-		Track:         float64(heading),
+		Track:         heading,
+		HeadingDeg:    heading,
 		Seen:          1.0,
 		Synthetic:     true,
 		SimulationNote: "EDUCATIONAL SIMULATION - PUBLIC SPECIFICATIONS ONLY",
@@ -75,32 +72,29 @@ func (s *Link16Simulator) GenerateTrack() (*models.AircraftEvent, error) {
 		Quality:       0.98,
 		Verified:      false,
 	}
-
 	return event, nil
 }
 
 // GenerateMultipleTracks generates multiple synthetic tracks.
-func (s *Link16Simulator) GenerateMultipleTracks(count int) ([]models.AircraftEvent, error) {
+func (s *Link16Simulator) GenerateMultipleTracks(count int) ([]*models.AircraftEvent, error) {
 	if count <= 0 {
 		return nil, fmt.Errorf("count must be positive")
 	}
 
-	tracks := make([]models.AircraftEvent, 0, count)
+	tracks := make([]*models.AircraftEvent, 0, count)
 	rng := rand.New(rand.NewSource(s.Seed))
 
 	for i := 0; i < count; i++ {
-		lat := s.MinLat + (rng.Float64()*1.0) // ±1 degree
-		lon := s.MinLon + (rng.Float64()*1.0)  // ±1 degree
-		alt := rand.Intn(s.MaxAlt-s.MinAlt) + s.MinAlt
-		speed := rand.Intn(s.MaxSpeed-s.MinSpeed) + s.MinSpeed
-		heading := rand.Intn(360)
-
-		trackID := fmt.Sprintf("SIM-%05d", rng.Intn(100000))
+		lat := s.MinLat + (rng.Float64() * 1.0)
+		lon := s.MinLon + (rng.Float64() * 1.0)
+		alt := rng.Intn(s.MaxAlt-s.MinAlt) + s.MinAlt
+		speed := rng.Intn(s.MaxSpeed-s.MinSpeed) + s.MinSpeed
+		heading := float64(rng.Intn(360))
 
 		event := &models.AircraftEvent{
 			SourceID:      s.SourceID,
 			SourceType:    "sim-link16",
-			ObservationID: fmt.Sprintf("link16-obs-%d", time.Now().Unix() + i),
+			ObservationID: fmt.Sprintf("link16-obs-%d", time.Now().UnixNano()+int64(rng.Intn(1000000))),
 			ObjectType:    "aircraft",
 			Hex:           fmt.Sprintf("SIM%04X", rng.Intn(10000)),
 			Flight:        fmt.Sprintf("SIM-LINK16-%03d", i),
@@ -108,7 +102,8 @@ func (s *Link16Simulator) GenerateMultipleTracks(count int) ([]models.AircraftEv
 			Lon:           lon,
 			AltM:          float64(alt),
 			Gs:            float64(speed),
-			Track:         float64(heading),
+			Track:         heading,
+			HeadingDeg:    heading,
 			Seen:          1.0,
 			Synthetic:     true,
 			SimulationNote: "EDUCATIONAL SIMULATION - PUBLIC SPECIFICATIONS ONLY",
@@ -117,16 +112,13 @@ func (s *Link16Simulator) GenerateMultipleTracks(count int) ([]models.AircraftEv
 			Quality:       0.98,
 			Verified:      false,
 		}
-
-		tracks = append(tracks, *event)
+		tracks = append(tracks, event)
 	}
-
 	return tracks, nil
 }
 
 // GenerateTrackPacket returns a synthetic Link 16 message packet.
 func (s *Link16Simulator) GenerateTrackPacket() ([]byte, error) {
-	// This is a simplified representation - actual Link 16 is binary
 	track := &models.AircraftEvent{
 		SourceID:      s.SourceID,
 		SourceType:    "sim-link16",
@@ -139,6 +131,7 @@ func (s *Link16Simulator) GenerateTrackPacket() ([]byte, error) {
 		AltM:          10000.0,
 		Gs:            450.0,
 		Track:         90.0,
+		HeadingDeg:    90.0,
 		Seen:          1.0,
 		Synthetic:     true,
 		SimulationNote: "EDUCATIONAL SIMULATION - PUBLIC SPECIFICATIONS ONLY",
@@ -147,13 +140,11 @@ func (s *Link16Simulator) GenerateTrackPacket() ([]byte, error) {
 		Quality:       0.98,
 		Verified:      false,
 	}
-
-	// Return as JSON for educational purposes (actual Link 16 is binary)
 	return json.Marshal(track)
 }
 
 // GenerateScenario generates a specific simulation scenario.
-func (s *Link16Simulator) GenerateScenario(scenario string) ([]models.AircraftEvent, error) {
+func (s *Link16Simulator) GenerateScenario(scenario string) ([]*models.AircraftEvent, error) {
 	switch scenario {
 	case "formation":
 		return s.generateFormationScenario()
@@ -166,11 +157,8 @@ func (s *Link16Simulator) GenerateScenario(scenario string) ([]models.AircraftEv
 	}
 }
 
-func (s *Link16Simulator) generateFormationScenario() ([]models.AircraftEvent, error) {
-	// Simple formation pattern
-	tracks := make([]models.AircraftEvent, 3)
-	rng := rand.New(rand.NewSource(s.Seed + 1))
-
+func (s *Link16Simulator) generateFormationScenario() ([]*models.AircraftEvent, error) {
+	tracks := make([]*models.AircraftEvent, 3)
 	for i := 0; i < 3; i++ {
 		tracks[i] = &models.AircraftEvent{
 			SourceID:      s.SourceID,
@@ -179,11 +167,12 @@ func (s *Link16Simulator) generateFormationScenario() ([]models.AircraftEvent, e
 			ObjectType:    "aircraft",
 			Hex:           fmt.Sprintf("SIM%04X", i+1),
 			Flight:        fmt.Sprintf("FORM-%d", i),
-			Lat:           52.1 + float64(i*0.001),
-			Lon:           19.2 + float64(i*0.001),
+			Lat:           52.1 + float64(i)*0.001,
+			Lon:           19.2 + float64(i)*0.001,
 			AltM:          10000.0 + float64(i*100),
 			Gs:            400.0 + float64(i*20),
 			Track:         90.0 + float64(i*10),
+			HeadingDeg:    90.0 + float64(i*10),
 			Seen:          1.0,
 			Synthetic:     true,
 			SimulationNote: "EDUCATIONAL SIMULATION - PUBLIC SPECIFICATIONS ONLY",
@@ -196,10 +185,8 @@ func (s *Link16Simulator) generateFormationScenario() ([]models.AircraftEvent, e
 	return tracks, nil
 }
 
-func (s *Link16Simulator) generatePatrolScenario() ([]models.AircraftEvent, error) {
-	tracks := make([]models.AircraftEvent, 1)
-	rng := rand.New(rand.NewSource(s.Seed + 2))
-
+func (s *Link16Simulator) generatePatrolScenario() ([]*models.AircraftEvent, error) {
+	tracks := make([]*models.AircraftEvent, 1)
 	tracks[0] = &models.AircraftEvent{
 		SourceID:      s.SourceID,
 		SourceType:    "sim-link16",
@@ -212,6 +199,7 @@ func (s *Link16Simulator) generatePatrolScenario() ([]models.AircraftEvent, erro
 		AltM:          10000.0,
 		Gs:            300.0,
 		Track:         0.0,
+		HeadingDeg:    0.0,
 		Seen:          1.0,
 		Synthetic:     true,
 		SimulationNote: "EDUCATIONAL SIMULATION - PUBLIC SPECIFICATIONS ONLY",
@@ -220,14 +208,11 @@ func (s *Link16Simulator) generatePatrolScenario() ([]models.AircraftEvent, erro
 		Quality:       0.98,
 		Verified:      false,
 	}
-
 	return tracks, nil
 }
 
-func (s *Link16Simulator) generateInterceptScenario() ([]models.AircraftEvent, error) {
-	tracks := make([]models.AircraftEvent, 2)
-	rng := rand.New(rand.NewSource(s.Seed + 3))
-
+func (s *Link16Simulator) generateInterceptScenario() ([]*models.AircraftEvent, error) {
+	tracks := make([]*models.AircraftEvent, 2)
 	for i := 0; i < 2; i++ {
 		tracks[i] = &models.AircraftEvent{
 			SourceID:      s.SourceID,
@@ -236,11 +221,12 @@ func (s *Link16Simulator) generateInterceptScenario() ([]models.AircraftEvent, e
 			ObjectType:    "aircraft",
 			Hex:           fmt.Sprintf("SIM%04X", i+1),
 			Flight:        fmt.Sprintf("INTERCEPT-%d", i),
-			Lat:           52.0 + float64(i*0.001),
-			Lon:           19.1 + float64(i*0.001),
+			Lat:           52.0 + float64(i)*0.001,
+			Lon:           19.1 + float64(i)*0.001,
 			AltM:          8000.0 + float64(i*500),
 			Gs:            500.0 + float64(i*100),
 			Track:         270.0 + float64(i*45),
+			HeadingDeg:    270.0 + float64(i*45),
 			Seen:          1.0,
 			Synthetic:     true,
 			SimulationNote: "EDUCATIONAL SIMULATION - PUBLIC SPECIFICATIONS ONLY",
@@ -258,7 +244,7 @@ func (s *Link16Simulator) Stats() map[string]interface{} {
 	return map[string]interface{}{
 		"source_id":     s.SourceID,
 		"simulated":     s.Simulated,
-		"total_tracks":  0, // Will be updated externally
+		"total_tracks":  0,
 		"min_alt":       s.MinAlt,
 		"max_alt":       s.MaxAlt,
 		"min_speed":     s.MinSpeed,

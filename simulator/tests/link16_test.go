@@ -3,7 +3,6 @@ package tests
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/pwojczyn/NieboGuard-Community/simulator/internal/military"
 	"github.com/pwojczyn/NieboGuard-Community/simulator/pkg/models"

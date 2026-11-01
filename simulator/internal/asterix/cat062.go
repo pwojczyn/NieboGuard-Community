@@ -3,7 +3,6 @@ package asterix
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"time"
 )
 
