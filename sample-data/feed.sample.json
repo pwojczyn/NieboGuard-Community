@@ -1,0 +1,26 @@
+{
+  "synthetic": true,
+  "note": "Fictional feed for tests only.",
+  "items": [
+    {
+      "id": "sample-feed-001",
+      "kind": "official",
+      "source": "sample",
+      "category": "WEATHER",
+      "title": "Synthetic weather warning",
+      "region": "mazowieckie",
+      "verification": "verified",
+      "published_at": "2026-01-01T10:00:00.000Z"
+    },
+    {
+      "id": "sample-feed-002",
+      "kind": "report",
+      "source": "sample",
+      "category": "OTHER",
+      "title": "Synthetic community observation",
+      "region": "lubelskie",
+      "verification": "unverified",
+      "published_at": "2026-01-01T09:00:00.000Z"
+    }
+  ]
+}

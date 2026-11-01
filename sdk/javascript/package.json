@@ -1,0 +1,11 @@
+{
+  "name": "nieboguard-community-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Read-only JavaScript client for the public NieboGuard API",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test ../../tests/sdk-js.test.mjs"
+  }
+}

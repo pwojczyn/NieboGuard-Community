@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "note": "Fictional map state for tests only.",
+  "updated": "2026-01-01T10:00:00.000Z",
+  "health": {
+    "neptun": true,
+    "ua_alerts": true,
+    "adsb": true,
+    "rcb": true,
+    "rso": true
+  },
+  "fusion": {
+    "window_min": 60,
+    "voivodeships": {
+      "mazowieckie": {"level": "none", "score": 0.0},
+      "lubelskie": {"level": "elevated", "score": 2.4}
+    }
+  }
+}

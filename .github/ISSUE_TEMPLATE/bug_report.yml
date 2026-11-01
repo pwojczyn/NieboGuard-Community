@@ -1,0 +1,40 @@
+name: Bug report
+description: Zgłoś błąd w SDK, narzędziu lub dokumentacji
+title: "[bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Nie publikuj sekretów, danych osobowych, tokenów ani współrzędnych prywatnych instalacji.
+        Luki bezpieczeństwa zgłaszaj prywatnie według SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: Co się stało?
+      description: Krótki opis i oczekiwane zachowanie.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimalna reprodukcja
+      description: Komendy lub fragment kodu bez sekretów i danych prywatnych.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Wersja / commit
+  - type: dropdown
+    id: area
+    attributes:
+      label: Obszar
+      options: [SDK JavaScript, SDK Python, ADS-B, Audio AI, Vision AI, Sensors, Docs, CI]
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Bezpieczeństwo
+      options:
+        - label: Usunąłem sekrety, dane osobowe i prywatne lokalizacje
+          required: true

@@ -1,0 +1,44 @@
+{
+  "synthetic": true,
+  "note": "Fictional aircraft for tests only. Not a real flight.",
+  "aircraft": [
+    {
+      "hex": "abc123",
+      "flight": "NGS001",
+      "lat": 52.1,
+      "lon": 19.2,
+      "alt_baro": 32000,
+      "gs": 450,
+      "track": 90,
+      "seen": 1.2,
+      "synthetic": true
+    },
+    {
+      "hex": "def456",
+      "flight": "NGS002",
+      "lat": 50.2,
+      "lon": 18.1,
+      "alt_baro": "ground",
+      "gs": 12,
+      "track": 180,
+      "seen": 0.5,
+      "synthetic": true
+    },
+    {
+      "hex": "bad001",
+      "flight": "NO-POS",
+      "lat": null,
+      "lon": null,
+      "seen": 3.0,
+      "synthetic": true
+    },
+    {
+      "hex": "zero00",
+      "flight": "ZERO-POS",
+      "lat": 0,
+      "lon": 0,
+      "seen": 4.0,
+      "synthetic": true
+    }
+  ]
+}

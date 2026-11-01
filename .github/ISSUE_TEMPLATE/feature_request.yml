@@ -1,0 +1,32 @@
+name: Feature request
+description: Zaproponuj narzędzie, dokumentację lub usprawnienie
+title: "[feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Jaki problem dla wolontariusza lub użytkownika chcesz rozwiązać?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propozycja
+      description: Zakres, API, dane wejściowe/wyjściowe, ryzyka.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatywy
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Granice projektu
+      options:
+        - label: Propozycja nie wymaga publikacji kodu produkcyjnego ani sekretów
+          required: true
+        - label: Dane przykładowe będą syntetyczne lub będą miały jasną licencję
+          required: true

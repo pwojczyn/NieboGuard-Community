@@ -1,0 +1,23 @@
+# Example label schema. This is not a trained model and not a fact.
+version: 1
+notes:
+  - multiple labels are allowed for overlapping sources
+  - model suggestions require human review
+  - YAMNet has no multirotor/commercial drone class
+classes:
+  - drone_multirotor
+  - drone_combustion
+  - jet
+  - propeller_aircraft
+  - helicopter
+  - other_aircraft
+  - motorcycle
+  - vehicle
+  - generator
+  - mower
+  - bird
+  - wind
+  - rain
+  - background
+  - unknown
+  - NOT_SURE

@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: NieboGuard public read-only API
+  version: "1.0"
+  description: |
+    Publiczne, read-only endpointy NieboGuard. Nie jest to oficjalny system
+    ostrzegania. Dane mogą być opóźnione lub niepełne.
+servers:
+  - url: https://api.nieboguard.pl
+paths:
+  /api/state:
+    get:
+      summary: Current map snapshot
+      responses:
+        "200": { description: JSON snapshot }
+        "503": { description: Snapshot unavailable }
+  /api/v2/feed:
+    get:
+      summary: Public feed
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50 } }
+        - { name: region, in: query, schema: { type: string } }
+        - { name: kind, in: query, schema: { type: string } }
+      responses:
+        "200": { description: Feed items }
+  /api/v2/alarms:
+    get:
+      summary: Canonical alarms and warnings
+      responses:
+        "200": { description: Alarm items }
+  /api/v2/incidents:
+    get:
+      summary: Public incidents
+      responses:
+        "200": { description: Incident items }
+  /api/v2/stats/overview:
+    get:
+      summary: Registry statistics
+      responses:
+        "200": { description: Aggregate counts and methodology links }
+  /api/v2/sources:
+    get:
+      summary: Public source registry
+      responses:
+        "200": { description: Sources with license and health metadata }
+  /api/v2/sources/{id}:
+    get:
+      summary: One public source
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Source metadata }
+        "404": { description: Not found }
+  /api/v2/locations:
+    get:
+      summary: Locations with local data
+      responses:
+        "200": { description: Voivodeship list }
+  /api/v2/threats:
+    get:
+      summary: Threat taxonomy
+      responses:
+        "200": { description: Threat categories }
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
