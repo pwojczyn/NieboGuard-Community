@@ -16,12 +16,13 @@
 - [x] Podman Quadlet + Docker Compose
 - [x] GitHub Actions CI/CD
 - [x] Dokumentacja (GETTING_STARTED, AUDIT, ARCHITECTURE)
-- [ ] Testy jednostkowe
-- [ ] Testy integracyjne
+- [x] Testy jednostkowe (Link 16, ASTERIX, load testing)
+- [x] Testy integracyjne (E2E pipeline)
+- [x] Testy obciążeniowe (10/100/500/1000/2000 obiektów)
 
 ## Etap 2 — rozszerzenia
 
-- [ ] ASTERIX (CAT 021, 048, 062)
+- [x] ASTERIX (CAT 021, 048, 062) — encoders i testy
 - [ ] FLARM / OGN
 - [ ] OpenDroneID / Remote ID
 - [ ] MQTT / IoT (ESP32)
@@ -43,7 +44,7 @@
 ## Etap 4 — zaawansowane możliwości
 
 - [ ] Korelacja danych z różnych radarów
-- [] Zaawansowane łączenie śladów
+- [ ] Zaawansowane łączenie śladów
 - [ ] Rozproszone przetwarzanie
 - [ ] Diagnostyka jakości odbioru
 - [ ] Długoterminowa historia
