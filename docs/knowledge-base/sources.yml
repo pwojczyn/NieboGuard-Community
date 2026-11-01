@@ -1,0 +1,147 @@
+# Machine-readable source registry for NieboGuard Protocol Knowledge Base
+# Source format: must be readable by GitHub Actions for verification
+sources:
+  - id: eurocontrol
+    name: European Organisation for the Safety of Air Navigation
+    official_url: https://www.eurocontrol.int/
+    documentation_url: https://www.eurocontrol.int/asterix
+    version: "2023"
+    license: commercial
+    last_verified: "2026-05-01"
+    notes: Official ASTERIX specifications (commercial)
+
+  - id: faa
+    name: Federal Aviation Administration
+    official_url: https://www.faa.gov/
+    version: "various"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: ADS-B implementation guides
+
+  - id: icao
+    name: International Civil Aviation Organization
+    official_url: https://www.icao.int/
+    version: "15.2"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: Annex 10 definitions
+
+  - id: itu
+    name: International Telecommunication Union
+    official_url: https://www.itu.int/
+    version: "M.1371/18"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: AIS specification
+
+  - id: wmo
+    name: World Meteorological Organization
+    official_url: https://www.wmo.int/
+    version: "various"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: BUFR, GRIB2, ODIM
+
+  - id: readsb
+    name: readsb
+    official_url: https://github.com/wiedehopf/readsb
+    version: "latest"
+    license: mit-like
+    last_verified: "2026-05-01"
+    notes: MIT-like, check specific files for license
+
+  - id: dump1090
+    name: dump1090
+    official_url: "Various (forks)"
+    version: "various"
+    license: "GPL/public domain"
+    last_verified: "2026-05-01"
+    notes: Different versions have different licenses
+
+  - id: asterixlibs
+    name: zoranbosnjak/asterix-libs
+    official_url: https://github.com/zoranbosnjak/asterix-libs
+    version: "latest"
+    license: commercial? (need verification)
+    last_verified: "2026-05-01"
+    notes: Need license verification for reuse
+
+  - id: opendroneid
+    name: OpenDroneID Core C
+    official_url: https://github.com/opendroneid/opendroneid-core-c
+    version: "v2.0"
+    license: mit
+    last_verified: "2026-05-01"
+    notes: MIT licensed
+
+  - id: openais
+    name: OpenAIS
+    official_url: https://github.com/openais
+    version: "latest"
+    license: bsd
+    last_verified: "2026-05-01"
+    notes: BSD licensed AIS processing
+
+  - id: esp_idf
+    name: ESP-IDF
+    official_url: https://docs.espressif.com/projects/esp-idf/en/latest/
+    version: "6.x"
+    license: proprietary
+    last_verified: "2026-05-01"
+    notes: Proprietary documentation
+
+  - id: rtlsdr
+    name: RTL-SDR
+    official_url: "https://sdrstok.nl/"
+    version: "2.0"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: Hardware driver source available
+
+  - id: flarm
+    name: FLARM
+    official_url: https://www.flarm.com/en/
+    version: "1.5"
+    license: commercial
+    last_verified: "2026-05-01"
+    notes: Commercial hardware and protocol
+
+  - id: glidernet
+    name: Open Glider Network
+    official_url: https://wiki.glidernet.org/
+    version: "2.x"
+    license: various
+    last_verified: "2026-05-01"
+    notes: APRS-based protocol
+
+  - id: mqtt
+    name: MQTT
+    official_url: https://www.oasis-open.org/standards/
+    version: "3.1.1"
+    license: mpl-2.0
+    last_verified: "2026-05-01"
+    notes: MQTT 3.1.1
+
+  - id: wss
+    name: WebSocket Secure
+    official_url: https://datatracker.ietf.org/doc/html/rfc6455
+    version: "RFC6455"
+    license: standard
+    last_verified: "2026-05-01"
+    notes: Standard RFC
+
+  - id: nmea
+    name: National Marine Electronics Association
+    official_url: "https://www.nmea.org/"
+    version: "0183"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: NMEA 0183 format
+
+  - id: pansa
+    name: Polish Air Navigation Services Agency
+    official_url: https://www.pansa.pl/
+    version: "2024"
+    license: public_domain
+    last_verified: "2026-05-01"
+    notes: Polish ATC data
