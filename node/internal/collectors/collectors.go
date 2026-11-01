@@ -2,15 +2,12 @@ package collectors
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 
 	"github.com/pwojczyn/NieboGuard-Community/node/internal/storage"
 	"github.com/pwojczyn/NieboGuard-Community/node/pkg/config"
 )
-
-var _ = fmt.Sprint
 
 // Collector is the interface for all data source adapters.
 type Collector interface {
@@ -63,7 +60,7 @@ func NewManager(cfg *config.Configuration, store *storage.Storage, logger *slog.
 		sources: make(map[string]Collector),
 	}
 
-	// Initialize default sources if configured
+	// Initialize default sources
 	m.initDefaultSources()
 
 	return m, nil
@@ -71,8 +68,6 @@ func NewManager(cfg *config.Configuration, store *storage.Storage, logger *slog.
 
 // initDefaultSources initializes built-in collectors.
 func (m *Manager) initDefaultSources() {
-	// In P0, we initialize basic collectors
-	// These will be expanded with full implementations
 	m.sources["local_adsb"] = &localADSbSource{
 		name:    "Local ADS-B",
 		logger:  m.logger,
