@@ -64,6 +64,17 @@ group and split. Model and library sizes are tracked separately. See
 Default ranges: MINI 25–50 MB, STANDARD 100–200 MB, EXTENDED 250–500 MB,
 GPU 500–1024 MB.
 
+## Academic pack preparation
+
+The trusted local pipeline lives in [`academic/`](academic/README.md). It
+downloads an archive, verifies SHA-256, safely extracts, groups by session and
+can upload small shards to R2. Full archives stay on a large local disk. See
+[`docs/ACADEMIC_PACK_PIPELINE.md`](docs/ACADEMIC_PACK_PIPELINE.md).
+
+```bash
+./academic/prepare-pack-linux.sh --help
+```
+
 ## Security
 
 - Ed25519-signed manifests pinned to a public key.

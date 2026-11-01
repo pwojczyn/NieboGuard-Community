@@ -79,6 +79,17 @@ grupę sesji i split. Model i biblioteki mają osobny rozmiar. Szczegóły:
 Domyślne zakresy: MINI 25–50 MB, STANDARD 100–200 MB, EXTENDED 250–500 MB,
 GPU 500–1024 MB.
 
+## Przygotowanie paczek akademickich
+
+Lokalny, zaufany pipeline jest w [`academic/`](academic/README.md). Pobiera
+archiwum, weryfikuje SHA-256, bezpiecznie rozpakowuje, dzieli po sesjach i
+opcjonalnie wysyła małe shardy do R2. Pełne archiwum zostaje na maszynie z
+dużym dyskiem. Instrukcja: [`docs/ACADEMIC_PACK_PIPELINE.md`](docs/ACADEMIC_PACK_PIPELINE.md).
+
+```bash
+./academic/prepare-pack-linux.sh --help
+```
+
 ## Bezpieczeństwo
 
 - manifest Ed25519 weryfikowany kluczem publicznym,

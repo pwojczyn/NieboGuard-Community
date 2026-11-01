@@ -1,0 +1,7 @@
+{
+  "drone": "drone_multirotor",
+  "helicopter": "helicopter",
+  "background": "background",
+  "airplane": "aircraft",
+  "bird": "bird"
+}

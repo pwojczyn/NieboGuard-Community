@@ -1,0 +1,8 @@
+{
+  "x4": "drone_multirotor",
+  "x6": "drone_combustion",
+  "drone": "drone_multirotor",
+  "uav": "drone_multirotor",
+  "background": "background",
+  "speech": "background"
+}

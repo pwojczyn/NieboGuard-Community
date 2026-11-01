@@ -1,0 +1,6 @@
+{
+  "microphone_array": "drone_multirotor",
+  "uav": "drone_multirotor",
+  "drone": "drone_multirotor",
+  "background": "background"
+}

@@ -2,6 +2,8 @@
 
 - [`ACADEMIC_SOURCES.md`](ACADEMIC_SOURCES.md) — dostępność, autorzy, licencje
   i statusy źródeł akademickich.
+- [`ACADEMIC_PACK_PIPELINE.md`](ACADEMIC_PACK_PIPELINE.md) — lokalne pobieranie,
+  rozpakowanie i przygotowanie paczek.
 - [`DATA_PACKS.md`](DATA_PACKS.md) — MINI/STANDARD/EXTENDED/GPU, deduplikacja,
   przydział i split po sesjach.
 - [`MODELS.md`](MODELS.md) — audyt modeli Audio AI/Vision AI i ograniczenia YAMNet.
