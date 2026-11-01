@@ -119,7 +119,12 @@ if [[ -t 0 && "$ASSUME_YES" != "1" && "${NIEBOGUARD_COMPUTE_NONINTERACTIVE:-0}" 
   GPU_PCT="${GPU_PCT:-60}"
   read -r -p "Harmonogram [manual/idle/always] (domyślnie manual): " SCHED || SCHED=""
   case "${SCHED:-manual}" in manual|idle|always) ;; *) SCHED="manual" ;; esac
+  read -r -p "Maks. paczka danych MB [50/200/500/1024] (domyślnie 200): " DATA_MB || DATA_MB=""
+  DATA_MB="${DATA_MB:-200}"
+  case "$DATA_MB" in 50) TIERS="MINI" ;; 500) TIERS="MINI,STANDARD,EXTENDED" ;; 1024) TIERS="GPU" ;; *) DATA_MB="200"; TIERS="MINI,STANDARD" ;; esac
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set modalities "$MODS" >/dev/null || true
+  "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set max_data_mb "$DATA_MB" >/dev/null || true
+  "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set pack_tiers "$TIERS" >/dev/null || true
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set max_cpu_percent "$CPU_PCT" >/dev/null || true
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set max_gpu_percent "$GPU_PCT" >/dev/null || true
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set schedule "${SCHED:-manual}" >/dev/null || true

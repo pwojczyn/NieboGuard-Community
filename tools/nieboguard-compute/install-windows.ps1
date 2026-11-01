@@ -111,7 +111,12 @@ if (-not $NonInteractive) {
   if (-not $gpuPct) { $gpuPct = "60" }
   $sched = Read-Host "Harmonogram [manual/idle/always] (domyślnie manual)"
   if ($sched -notin @("manual", "idle", "always")) { $sched = "manual" }
+  $dataMb = Read-Host "Maks. paczka danych MB [50/200/500/1024] (domyślnie 200)"
+  if ($dataMb -notin @("50", "200", "500", "1024")) { $dataMb = "200" }
+  switch ($dataMb) { "50" { $tiers = "MINI" } "500" { $tiers = "MINI,STANDARD,EXTENDED" } "1024" { $tiers = "GPU" } default { $tiers = "MINI,STANDARD" } }
   & $wrapper --data-dir $Data config set modalities $mods | Out-Null
+  & $wrapper --data-dir $Data config set max_data_mb $dataMb | Out-Null
+  & $wrapper --data-dir $Data config set pack_tiers $tiers | Out-Null
   & $wrapper --data-dir $Data config set max_cpu_percent $cpuPct | Out-Null
   & $wrapper --data-dir $Data config set max_gpu_percent $gpuPct | Out-Null
   & $wrapper --data-dir $Data config set schedule $sched | Out-Null

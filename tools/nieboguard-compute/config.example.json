@@ -14,6 +14,8 @@
   "schedule": "manual",
   "idle_minutes": 10,
   "max_disk_gb": 5,
+  "max_data_mb": 200,
+  "pack_tiers": ["MINI", "STANDARD"],
   "max_task_seconds": null,
   "data_dir": "",
   "leaderboard_opt_in": false
