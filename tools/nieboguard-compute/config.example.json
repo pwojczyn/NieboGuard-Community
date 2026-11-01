@@ -1,0 +1,20 @@
+{
+  "config_version": 1,
+  "api_base": "https://api.neboguard.pl",
+  "manifest_public_key": "WKLEJ_KLUCZ_PUBLICZNY_Z_WYDANIA",
+  "manifest_key_id": "ng-compute-1",
+  "device_id": null,
+  "refresh_token": null,
+  "consent_version": "2026-11-01",
+  "consent_at": null,
+  "display_name": null,
+  "modalities": ["audio"],
+  "max_cpu_percent": 50,
+  "max_gpu_percent": 60,
+  "schedule": "manual",
+  "idle_minutes": 10,
+  "max_disk_gb": 5,
+  "max_task_seconds": null,
+  "data_dir": "",
+  "leaderboard_opt_in": false
+}

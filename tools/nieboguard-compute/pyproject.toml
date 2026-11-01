@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nieboguard-compute"
+version = "0.1.0"
+description = "Publiczny klient NieboGuard Compute do bezpiecznego, rozproszonego trenowania małych modeli AI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "NieboGuard Community"}]
+dependencies = []
+
+[project.optional-dependencies]
+numpy = ["numpy==2.5.4"]
+torch = ["torch>=2.4,<3"]
+dev = []
+
+[project.scripts]
+nieboguard-compute = "nieboguard_compute.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

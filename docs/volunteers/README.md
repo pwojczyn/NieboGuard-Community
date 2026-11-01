@@ -9,6 +9,8 @@
   uploadu i bez prywatnych rozmów.
 - **Vision AI** — obrazy z jasną licencją, usunięte EXIF, ręczne etykiety.
 - **Code** — SDK, narzędzia, walidacja, CI.
+- **NieboGuard Compute** — użycz CPU/GPU do lokalnego trenowania małych
+  modeli; instalacja, limity i zasady: [`tools/nieboguard-compute`](../../tools/nieboguard-compute/README.md).
 
 ## Zadania
 
@@ -34,3 +36,9 @@ zostać opcjonalnie połączone z GitHubem przez OAuth. Szczegóły i granice:
 - Dane demonstracyjne oznaczaj `synthetic: true`.
 - Nie zgłaszaj zagrożeń wymagających natychmiastowej reakcji przez GitHub.
   W razie zagrożenia dzwoń 112 i kieruj się komunikatami służb.
+
+## NieboGuard Compute
+
+Klient Compute jest w `tools/nieboguard-compute/`. Wymaga jawnej zgody,
+nie startuje w tle i nie wykonuje kodu z backendu. Wyniki trafiają do
+kwarantanny i niezależnej ewaluacji; nie są automatycznie publikowane.

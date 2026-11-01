@@ -12,8 +12,9 @@ Dziękujemy za zainteresowanie NieboGuard Community.
    osobowych.
 5. Nowe pliki są udostępniane na MIT; nie kopiuj kodu o niejasnej licencji.
 6. Dodaj test lub wyjaśnij, dlaczego test nie jest możliwy.
-7. Uruchom `python -m unittest discover -s tests -v` i
-   `node --test tests/*.test.mjs`.
+7. Uruchom `python -m unittest discover -s tests -v`,
+   `node --test tests/*.test.mjs` oraz testy Compute:
+   `python -m unittest discover -s tools/nieboguard-compute/tests -v`.
 
 ## Styl
 

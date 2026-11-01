@@ -11,6 +11,8 @@ Otwarte dokumenty, SDK i narzędzia dla społeczności wokół [NieboGuard](http
 - dokumentacja publicznego API i architektury,
 - SDK JavaScript i Python do publicznych endpointów read-only,
 - narzędzia ADS-B, audio, vision i sensorów,
+- **NieboGuard Compute** — klient rozproszonego trenowania Audio AI/Vision AI,
+  instalatory Windows/Linux, małe paczki danych i audyt źródeł akademickich,
 - syntetyczne dane testowe,
 - tutoriale dla wolontariuszy,
 - szablony zgłoszeń błędów i propozycji funkcji.
@@ -36,8 +38,22 @@ python -m unittest discover -s tests -v
 node --test tests/*.test.mjs
 ```
 
-SDK JavaScript nie ma zależności produkcyjnych. SDK Python korzysta wyłącznie
-ze standardowej biblioteki. Narzędzie vision opcjonalnie wymaga Pillow.
+SDK JavaScript nie ma zależności produkcyjnych. SDK Python i klient Compute
+korzystają wyłącznie ze standardowej biblioteki. Narzędzie vision opcjonalnie
+wymaga Pillow.
+
+## NieboGuard Compute
+
+Klient społecznościowego trenowania AI jest w
+[`tools/nieboguard-compute/`](tools/nieboguard-compute/README.md). Obsługuje
+Windows/Linux, CPU i opcjonalne NVIDIA GPU, małe paczki danych MINI/STANDARD/
+EXTENDED/GPU oraz bezpieczny safetensors. Udział wymaga jawnej zgody; klient
+nie działa w tle i nie wykonuje kodu z backendu.
+
+```bash
+cd tools/nieboguard-compute
+python -m unittest discover -s tests -v
+```
 
 ## Testowy APK
 

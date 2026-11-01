@@ -16,3 +16,9 @@ detect objects or identify people.
 
 Before publishing any image: check consent, license, faces, plates and private
 installations. `NOT_SURE` is a valid annotation.
+
+## NieboGuard Compute
+
+Trening lekkiej głowy detekcji (objectness + klasy + box) na cechach
+propozycji jest w [`tools/nieboguard-compute`](../nieboguard-compute/README.md).
+Nie jest to pełny YOLO od zera; backbone pozostaje zamrożony.

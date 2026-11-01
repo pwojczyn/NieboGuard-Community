@@ -2,7 +2,7 @@ name: Community CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, community/bootstrap]
   pull_request:
   workflow_dispatch:
 
@@ -27,6 +27,24 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: JavaScript SDK tests
         run: node --test tests/sdk-js.test.mjs
+      - name: NieboGuard Compute unit tests
+        run: python -m unittest discover -s tools/nieboguard-compute/tests -v
+      - name: NieboGuard Compute shell syntax
+        run: |
+          bash -n tools/nieboguard-compute/install-linux.sh
+          bash -n tools/nieboguard-compute/start-linux.sh
+          bash -n tools/nieboguard-compute/uninstall-linux.sh
+          python -m py_compile tools/nieboguard-compute/src/nieboguard_compute/*.py
+      - name: NieboGuard Compute PowerShell syntax
+        shell: pwsh
+        run: |
+          $bad = 0
+          Get-ChildItem tools/nieboguard-compute/*.ps1 | ForEach-Object {
+            $tokens = $null; $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) { $bad = 1; $errors | ForEach-Object { Write-Error $_.Message } }
+          }
+          exit $bad
       - name: Example syntax checks
         run: |
           node --check examples/state_watch.mjs

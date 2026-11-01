@@ -38,3 +38,23 @@ instalacji.
 - publiczne workflow nie mają dostępu do sekretów prywatnego repo.
 
 Dziękujemy za odpowiedzialne zgłoszenia.
+
+## NieboGuard Compute
+
+Klient Compute przyjmuje wyłącznie podpisane manifesty Ed25519, safetensors bez
+pickle i pliki z limitem rozmiaru oraz SHA-256. Nie uruchamia kodu z backendu.
+Wyniki są kwarantanną po stronie prywatnego backendu, nie automatyczną
+produkcją.
+
+Zgłaszaj prywatnie:
+
+- obejście weryfikacji podpisu manifestu,
+- path traversal lub pobranie spoza dozwolonego origin,
+- wykonanie kodu z pliku zadania,
+- ujawnienie tokenu urządzenia,
+- obejście limitu CPU/GPU/danych,
+- błąd w local agent (nasłuch poza loopbackiem, obcy Origin).
+
+Nie publikuj tokenów, kluczy, prywatnych danych ani exploitów. Lokalny agent
+Compute jest opcjonalny, działa na `127.0.0.1:8765` i nie może być wystawiany
+na LAN.
