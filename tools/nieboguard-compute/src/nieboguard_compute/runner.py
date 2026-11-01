@@ -43,6 +43,14 @@ class Runner:
             raise RunnerError("Brak rejestracji. Uruchom: nieboguard-compute enroll --invite <kod> --consent")
         try:
             self.client.refresh(str(self.cfg["device_id"]), str(self.cfg["refresh_token"]))
+            self.client.update_preferences({
+                "modalities": self.cfg.get("modalities") or ["audio"],
+                "max_cpu_percent": int(self.cfg.get("max_cpu_percent") or 50),
+                "max_gpu_percent": int(self.cfg.get("max_gpu_percent") or 60),
+                "schedule": self.cfg.get("schedule") or "manual",
+                "max_data_mb": float(self.cfg.get("max_data_mb") or 0),
+                "pack_tiers": self.cfg.get("pack_tiers") or [],
+            })
         except ApiError as exc:
             if exc.code in ("device_revoked", "unauthorized"):
                 raise RunnerError("Urządzenie zostało odłączone lub token jest nieprawidłowy. Zarejestruj ponownie.") from exc

@@ -129,6 +129,9 @@ class Client:
     def me(self) -> dict[str, Any]:
         return self._request("GET", "/api/v2/compute/me", expected=(200,))
 
+    def update_preferences(self, preferences: dict[str, Any]) -> dict[str, Any]:
+        return self._request("PUT", "/api/v2/compute/me/preferences", {"preferences": preferences}, expected=(200,))
+
     def revoke(self, reason: str) -> dict[str, Any]:
         return self._request("POST", "/api/v2/compute/consent/revoke", {"reason": reason}, expected=(200,))
 

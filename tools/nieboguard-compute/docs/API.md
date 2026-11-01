@@ -55,6 +55,11 @@ pojemność 503.
 
 Statystyki wkładu i ostatnie zadania.
 
+### `PUT /compute/me/preferences` (Bearer, `preferences:write`)
+
+Aktualizuje modalności, limity CPU/GPU, harmonogram, `max_data_mb` i
+`pack_tiers` po rejestracji.
+
 ### `POST /compute/consent/revoke` (Bearer, `consent:revoke`)
 
 Unieważnia urządzenie, refresh i access tokeny oraz anuluje leasingi.
