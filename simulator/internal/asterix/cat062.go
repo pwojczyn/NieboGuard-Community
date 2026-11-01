@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"encoding/binary"
 	"time"
+
+	"github.com/pwojczyn/NieboGuard-Community/simulator/pkg/models"
 )
 
 // CAT062Encoder generates simulated system tracks (tracked objects with history).
 type CAT062Encoder struct {
-	DataSourceID uint16
-	TrackCounter uint16
-	ActiveTracks map[string]*TrackState
+	DataSourceID  uint16
+	TrackCounter  uint16
+	ActiveTracks  map[string]*TrackState
 }
 
 type TrackState struct {
@@ -20,14 +22,16 @@ type TrackState struct {
 	Speed       float64
 	Track       float64
 	LastUpdate  time.Time
-	TTL         int // seconds
+	TTL         int
 	Status      uint8 // 0=new, 1=active, 2=coasting, 3=terminated
 }
 
-func (e *CAT062Encoder) Encode(simObs *SimulatedObservation) ([]byte, error) {
+// Encode takes a unified AircraftEvent and produces a CAT062 record.
+func (e *CAT062Encoder) Encode(event *models.AircraftEvent) ([]byte, error) {
 	e.init()
 
-	track, exists := e.ActiveTracks[simObs.ID]
+	trackKey := event.SourceID + ":" + event.Flight
+	track, exists := e.ActiveTracks[trackKey]
 	if !exists {
 		e.TrackCounter++
 		track = &TrackState{
@@ -35,14 +39,14 @@ func (e *CAT062Encoder) Encode(simObs *SimulatedObservation) ([]byte, error) {
 			Status:      0, // new
 			TTL:         30,
 		}
-		e.ActiveTracks[simObs.ID] = track
+		e.ActiveTracks[trackKey] = track
 	}
 
 	// Update track with new observation
-	track.Lat = simObs.Lat
-	track.Lon = simObs.Lon
-	track.Speed = simObs.SpeedMps * 1.944 // m/s to knots
-	track.Track = simObs.HeadingDeg
+	track.Lat = event.Lat
+	track.Lon = event.Lon
+	track.Speed = event.Gs * 1.944 // m/s to knots
+	track.Track = event.HeadingDeg
 	track.LastUpdate = time.Now()
 	track.Status = 1 // active
 
@@ -57,7 +61,7 @@ func (e *CAT062Encoder) Encode(simObs *SimulatedObservation) ([]byte, error) {
 	// Track Number
 	binary.Write(buf, binary.BigEndian, track.TrackNumber)
 
-	// Latitude
+	// Latitude (scaled 1/128 minutes)
 	latScaled := int32(track.Lat * 128 * 60)
 	binary.Write(buf, binary.BigEndian, latScaled)
 
@@ -65,18 +69,18 @@ func (e *CAT062Encoder) Encode(simObs *SimulatedObservation) ([]byte, error) {
 	lonScaled := int32(track.Lon * 128 * 60)
 	binary.Write(buf, binary.BigEndian, lonScaled)
 
-	// Speed
+	// Speed (knots / 2)
 	speedScaled := uint16(track.Speed / 2)
 	binary.Write(buf, binary.BigEndian, speedScaled)
 
-	// Track angle
+	// Track angle (degrees * 90)
 	trackScaled := uint16(track.Track * 90)
 	binary.Write(buf, binary.BigEndian, trackScaled)
 
 	// Track Status
 	buf.WriteByte(track.Status)
 
-	// Time of Track (3 bytes)
+	// Time of Track (3 bytes, sec of day)
 	secOfDay := uint32(time.Now().UTC().Hour()*3600 + time.Now().UTC().Minute()*60 + time.Now().UTC().Second())
 	buf.WriteByte(byte(secOfDay >> 16))
 	buf.WriteByte(byte(secOfDay >> 8))
@@ -97,12 +101,4 @@ func (e *CAT062Encoder) CleanupExpired(maxAge time.Duration) {
 			delete(e.ActiveTracks, id)
 		}
 	}
-}
-
-type SimulatedObservation struct {
-	ID         string  `json:"id"`
-	Lat        float64 `json:"lat"`
-	Lon        float64 `json:"lon"`
-	SpeedMps   float64 `json:"speed_mps"`
-	HeadingDeg float64 `json:"heading_deg"`
 }
