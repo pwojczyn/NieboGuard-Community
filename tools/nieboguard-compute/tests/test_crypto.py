@@ -23,6 +23,8 @@ class CryptoTest(unittest.TestCase):
         self.assertEqual(canonical_json({"b": 2, "a": [1.0, 1e-7, True, None]}),
                          '{"a":[1,1e-7,true,null],"b":2}')
         self.assertEqual(canonical_json({"x": 0.001, "y": 1.5}), '{"x":0.001,"y":1.5}')
+        self.assertEqual(canonical_json([0.00001, 0.000001, 1e-7, 1e20, 1e21]),
+                         "[0.00001,0.000001,1e-7,100000000000000000000,1e+21]")
 
     def test_manifest_requires_signature(self):
         with self.assertRaises(SignatureError):

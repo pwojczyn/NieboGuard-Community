@@ -14,7 +14,7 @@ from typing import Any
 
 from .model import (AUDIO_NAMES, VISION_NAMES, TrainConfig, TrainingError, _check_specs,
                     _class_counts, _spec_map, _split, _vision_label_index,
-                    deterministic_init, evaluate_audio, evaluate_vision, save_checkpoint, tensor_stats)
+                    deterministic_init, evaluate_audio, evaluate_vision, load_base_tensors, save_checkpoint, tensor_stats)
 from .safetensors import Tensor
 
 try:
@@ -63,7 +63,7 @@ def _load_init(net: Any, specs: list[dict[str, Any]], seed: int, checkpoint: Any
                         param = net.state_dict()[name]
                         param.copy_(torch.tensor(old[name].values, dtype=param.dtype, device=param.device).reshape(param.shape))
             return int(meta.get("epoch", 0))
-    init = deterministic_init(specs, seed)
+    init = load_base_tensors(specs, cfg.base_artifact) if cfg.base_artifact and cfg.base_artifact.exists() else deterministic_init(specs, seed)
     with torch.no_grad():
         for spec in specs:
             name = spec["name"]
@@ -99,13 +99,11 @@ else:
 
 
 def _device(cfg: TrainConfig) -> Any:
-    if torch.cuda.is_available() and cfg.device != "cpu":
+    gpu_percent = max(0, min(100, int(getattr(cfg, "max_gpu_percent", 0))))
+    if torch.cuda.is_available() and cfg.device != "cpu" and gpu_percent > 0:
         device = torch.device("cuda")
-        if cfg.cpu_percent <= 0:
-            raise TrainingError("GPU jest wyłączone przez limit")
         try:
-            if cfg.max_seconds:
-                torch.cuda.set_per_process_memory_fraction(0.8, device)
+            torch.cuda.set_per_process_memory_fraction(max(0.05, min(0.95, gpu_percent / 100.0)), device)
         except Exception:
             pass
         return device
@@ -114,6 +112,15 @@ def _device(cfg: TrainConfig) -> Any:
 
 def _val_split(data: list[dict[str, Any]], seed: int):
     return _split(data, seed)
+
+
+def _throttle(start_wall: float, start_cpu: float, cpu_percent: int) -> None:
+    import time
+    wall = time.monotonic() - start_wall
+    cpu = time.process_time() - start_cpu
+    limit = max(0.05, min(1.0, cpu_percent / 100.0))
+    if cpu > wall * limit + 0.05:
+        time.sleep(min(0.05, cpu - wall * limit))
 
 
 def train_audio_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: TrainConfig) -> dict[str, Any]:
@@ -125,23 +132,24 @@ def train_audio_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], c
     train, val = _val_split(data, cfg.seed)
     device = _device(cfg)
     net = _AudioNet(input_dim, hidden, classes).to(device)
-    start_epoch = _load_init(net, specs, cfg.seed, None, cfg)
+    start_epoch = _load_init(net, specs, cfg.seed, cfg.checkpoint, cfg)
     opt = torch.optim.Adam(net.parameters(), lr=cfg.learning_rate, weight_decay=cfg.weight_decay)
     xs = torch.tensor([r["features"] for r in train], dtype=torch.float32, device=device)
     ys = torch.tensor([cfg.classes.index(r["label"]) for r in train], dtype=torch.long, device=device)
     loss_fn = nn.CrossEntropyLoss()
     start_wall = time.monotonic()
+    start_cpu = time.process_time()
     steps = 0
     epochs_done = start_epoch
     history = []
     for epoch in range(start_epoch, cfg.epochs):
-        if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps:
+        if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
             break
         perm = torch.randperm(len(train), device=device)
         total = 0.0
         seen = 0
         for start in range(0, len(train), max(1, cfg.batch_size)):
-            if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps:
+            if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
                 break
             idx = perm[start:start + max(1, cfg.batch_size)]
             logits = net(xs[idx])
@@ -149,6 +157,7 @@ def train_audio_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], c
             opt.zero_grad()
             loss.backward()
             opt.step()
+            _throttle(start_wall, start_cpu, cfg.cpu_percent)
             total += float(loss.detach().cpu())
             seen += len(idx)
             steps += 1
@@ -166,6 +175,7 @@ def train_audio_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], c
                     "duration_s": round(time.monotonic() - start_wall, 3), "epochs_completed": epochs_done,
                     "backend": "torch", "device": str(device), "resumed": start_epoch > 0},
         "history": history, "validation_size": len(val),
+        "stopped": bool(cfg.should_stop and cfg.should_stop()),
     }
 
 
@@ -178,7 +188,7 @@ def train_vision_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], 
     train, val = _val_split(data, cfg.seed)
     device = _device(cfg)
     net = _VisionNet(input_dim, hidden, classes).to(device)
-    start_epoch = _load_init(net, specs, cfg.seed, None, cfg)
+    start_epoch = _load_init(net, specs, cfg.seed, cfg.checkpoint, cfg)
     opt = torch.optim.Adam(net.parameters(), lr=cfg.learning_rate, weight_decay=cfg.weight_decay)
     xs = torch.tensor([r["features"] for r in train], dtype=torch.float32, device=device)
     obj = torch.tensor([1.0 if r["objectness"] else 0.0 for r in train], dtype=torch.float32, device=device)
@@ -188,17 +198,18 @@ def train_vision_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], 
     bce = nn.BCEWithLogitsLoss()
     ce = nn.CrossEntropyLoss()
     start_wall = time.monotonic()
+    start_cpu = time.process_time()
     steps = 0
     epochs_done = start_epoch
     history = []
     for epoch in range(start_epoch, cfg.epochs):
-        if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps:
+        if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
             break
         perm = torch.randperm(len(train), device=device)
         total = 0.0
         seen = 0
         for start in range(0, len(train), max(1, cfg.batch_size)):
-            if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps:
+            if time.monotonic() - start_wall >= cfg.max_seconds or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
                 break
             idx = perm[start:start + max(1, cfg.batch_size)]
             obj_logits, logits, box = net(xs[idx])
@@ -210,6 +221,7 @@ def train_vision_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], 
             opt.zero_grad()
             loss.backward()
             opt.step()
+            _throttle(start_wall, start_cpu, cfg.cpu_percent)
             total += float(loss.detach().cpu())
             seen += len(idx)
             steps += 1
@@ -227,4 +239,5 @@ def train_vision_torch(data: list[dict[str, Any]], specs: list[dict[str, Any]], 
                     "duration_s": round(time.monotonic() - start_wall, 3), "epochs_completed": epochs_done,
                     "backend": "torch", "device": str(device), "resumed": start_epoch > 0},
         "history": history, "validation_size": len(val),
+        "stopped": bool(cfg.should_stop and cfg.should_stop()),
     }

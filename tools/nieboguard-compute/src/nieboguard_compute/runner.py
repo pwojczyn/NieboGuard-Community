@@ -14,7 +14,7 @@ from .config import data_root
 from .crypto import sha256_hex
 from .hardware import detect, idle_seconds
 from .manifest import ManifestError, safe_work_name, validate_manifest
-from .model import TrainConfig, export_artifact, train_audio, train_vision
+from .model import TrainConfig, TrainingError, export_artifact, train_audio, train_vision
 from .torch_backend import TORCH_AVAILABLE, cuda_available, train_audio_torch, train_vision_torch
 from .vision import load_vision_dataset
 
@@ -116,7 +116,7 @@ class Runner:
                     failures = 0
                 else:
                     failures += 1
-            except (ManifestError, RunnerError, ApiError, ValueError, OSError) as exc:
+            except (ManifestError, RunnerError, TrainingError, ApiError, ValueError, OSError, KeyError) as exc:
                 failures += 1
                 self.log(f"Zadanie nieukończone: {exc}")
                 task_id = str(manifest.get("task_id") or "")
@@ -166,31 +166,44 @@ class Runner:
         pack = info.get("pack")
         pack_text = f", paczka {pack['tier']} {pack['id']} ({pack['bytes']} B)" if pack else ""
         self.log(f"Zadanie {info['task_id']}: {info['task_type']}, {info['shard_count']} plików, {total} B{pack_text}.")
+        split_by_file = {}
         for shard in manifest["dataset"]["shards"]:
             name = safe_work_name(str(shard["name"]), "shard")
+            split_by_file[name] = str(shard.get("split") or "train")
             target = data_dir / name
             checksum = str(shard["sha256"]).lower()
             if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest() == checksum:
                 continue
             self.log(f"Pobieram {name} ({shard.get('bytes')} B)…")
             self.client.download(str(shard["url"]), target, int(shard.get("bytes") or 0), checksum)
+        base_artifact = None
+        base_model = manifest.get("base_model") or {}
+        if base_model.get("url"):
+            base_path = work / "base.safetensors"
+            if not base_path.exists() or sha256_hex(base_path.read_bytes()) != str(base_model.get("sha256")):
+                self.log("Pobieram model bazowy…")
+                self.client.download(str(base_model["url"]), base_path, 16 * 1024 * 1024, str(base_model.get("sha256") or ""))
+            base_artifact = base_path
         architecture = manifest["architecture"]
         specs = architecture["tensor_specs"]
         backbone = next((s for s in specs if s.get("name") == "backbone.weight"), None)
         input_dim = int(backbone["shape"][0]) if backbone and backbone.get("shape") else 0
         classes = [str(x) for x in manifest["classes"]]
         if info["task_type"] == "audio-classification":
-            data = load_audio_dataset(data_dir, input_dim, classes)
+            data = load_audio_dataset(data_dir, input_dim, classes, split_by_file)
             trainer = train_audio
             torch_trainer = train_audio_torch
         elif info["task_type"] == "vision-detection-head":
-            data = load_vision_dataset(data_dir, input_dim, classes)
+            data = load_vision_dataset(data_dir, input_dim, classes, split_by_file)
             trainer = train_vision
             torch_trainer = train_vision_torch
         else:
             raise RunnerError("Nieobsługiwany typ zadania.")
         requested_backend = os.environ.get("NIEBOGUARD_COMPUTE_BACKEND", "auto").lower()
-        use_torch = TORCH_AVAILABLE and requested_backend in ("auto", "torch", "cuda") and (requested_backend in ("torch", "cuda") or cuda_available())
+        gpu_percent = int(self.cfg.get("max_gpu_percent") or 0)
+        use_torch = TORCH_AVAILABLE and requested_backend in ("auto", "torch", "cuda") and (
+            requested_backend in ("torch", "cuda") or (cuda_available() and gpu_percent > 0)
+        )
         if use_torch:
             trainer = torch_trainer
         hyper = manifest.get("hyperparams") or {}
@@ -207,10 +220,17 @@ class Runner:
             max_seconds=max_seconds, cpu_percent=int(self.cfg.get("max_cpu_percent", 50)),
             checkpoint=work / "checkpoint.safetensors", resume=True,
             backend="torch" if use_torch else "python",
-            device="cuda" if use_torch and cuda_available() else "cpu",
+            device="cuda" if use_torch and cuda_available() and int(self.cfg.get("max_gpu_percent") or 0) > 0 else "cpu",
+            max_gpu_percent=int(self.cfg.get("max_gpu_percent") or 0),
+            should_stop=self.stop_requested,
+            base_artifact=base_artifact,
         )
         self.log("Trenuję lokalnie. Możesz zatrzymać proces; checkpoint pozwoli wznowić.")
         result = trainer(data, specs, cfg)
+        if result.get("stopped") or self.stop_requested():
+            self._call_with_refresh("fail", info["task_id"], "stopped by user before upload")
+            self.log("Zatrzymano po checkpointcie; wynik nie został wysłany.")
+            return "stopped"
         artifact_path = work / "artifact.safetensors"
         blob, _metadata = export_artifact(result, cfg, artifact_path, len(data))
         sha = sha256_hex(blob)

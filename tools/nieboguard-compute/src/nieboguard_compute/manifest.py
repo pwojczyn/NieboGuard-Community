@@ -103,6 +103,8 @@ def validate_manifest(manifest: dict[str, Any], public_key: str | None, api_base
         checksum = str(shard.get("sha256") or "").lower()
         if len(checksum) != 64 or any(c not in "0123456789abcdef" for c in checksum):
             raise ManifestError(f"shard {name} has no valid SHA-256")
+    if max_data_mb is not None and total > max_data_mb * 1_000_000:
+        raise ManifestError("dataset shards exceed configured data limit")
     upload = manifest.get("upload")
     if not isinstance(upload, dict):
         raise ManifestError("manifest has no upload slot")
@@ -127,6 +129,12 @@ def validate_manifest(manifest: dict[str, Any], public_key: str | None, api_base
         raise ManifestError("manifest has no classes")
     if "base_model" not in manifest or not manifest["base_model"].get("version"):
         raise ManifestError("manifest has no exact base model")
+    base_model = manifest.get("base_model") or {}
+    if base_model.get("url"):
+        if not same_origin(str(base_model["url"]), api_base):
+            raise ManifestError("base model URL is not on the configured API origin")
+        if not re.fullmatch(r"[0-9a-f]{64}", str(base_model.get("sha256") or "")):
+            raise ManifestError("base model artifact has no valid SHA-256")
     max_seconds = _int(manifest.get("max_train_seconds"), "max_train_seconds", 10, 86400)
     hyper = manifest.get("hyperparams") or {}
     for name, lo, hi in (("epochs", 1, 100), ("batch_size", 1, 512), ("max_steps", 10, 100000)):

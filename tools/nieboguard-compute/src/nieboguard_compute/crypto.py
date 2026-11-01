@@ -10,6 +10,7 @@ import hashlib
 import json
 import math
 import re
+from decimal import Decimal
 from typing import Any
 
 
@@ -43,6 +44,10 @@ def _js_number(value: float) -> str:
         return "0"
     if value.is_integer() and abs(value) < 1e21:
         return str(int(value))
+    absolute = abs(value)
+    # ECMAScript uses fixed notation for 1e-6 <= |x| < 1e21.
+    if 1e-6 <= absolute < 1e21:
+        return format(Decimal(repr(value)), "f")
     text = repr(value)
     if "e" in text or "E" in text:
         mantissa, exponent = re.split("[eE]", text, maxsplit=1)

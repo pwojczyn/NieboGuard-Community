@@ -78,7 +78,7 @@ $cmdPath = Join-Path $Bin "nieboguard-compute.cmd"
 setlocal
 set "ROOT=%~dp0.."
 set "PYTHONPATH=%ROOT%\src;%PYTHONPATH%"
-"%ROOT%\.venv\Scripts\python.exe" -m nieboguard_compute %*
+"%ROOT%\.venv\Scripts\python.exe" -m nieboguard_compute --data-dir "%ROOT%\data" %*
 exit /b %ERRORLEVEL%
 "@ | Set-Content -Encoding ASCII -Path $cmdPath
 $psPath = Join-Path $Bin "nieboguard-compute.ps1"
@@ -86,7 +86,7 @@ $psPath = Join-Path $Bin "nieboguard-compute.ps1"
 `$ErrorActionPreference = "Stop"
 `$Root = Split-Path -Parent (Split-Path -Parent `$MyInvocation.MyCommand.Path)
 `$env:PYTHONPATH = Join-Path `$Root "src"
-& (Join-Path `$Root ".venv\Scripts\python.exe") -m nieboguard_compute @args
+& (Join-Path `$Root ".venv\Scripts\python.exe") -m nieboguard_compute --data-dir (Join-Path `$Root "data") @args
 exit `$LASTEXITCODE
 "@ | Set-Content -Encoding UTF8 -Path $psPath
 
@@ -113,7 +113,7 @@ if (-not $NonInteractive) {
   if ($sched -notin @("manual", "idle", "always")) { $sched = "manual" }
   $dataMb = Read-Host "Maks. paczka danych MB [50/200/500/1024] (domyślnie 200)"
   if ($dataMb -notin @("50", "200", "500", "1024")) { $dataMb = "200" }
-  switch ($dataMb) { "50" { $tiers = "MINI" } "500" { $tiers = "MINI,STANDARD,EXTENDED" } "1024" { $tiers = "GPU" } default { $tiers = "MINI,STANDARD" } }
+  switch ($dataMb) { "50" { $tiers = "MINI" } "500" { $tiers = "MINI,STANDARD,EXTENDED" } "1024" { $tiers = "MINI,STANDARD,EXTENDED,GPU" } default { $tiers = "MINI,STANDARD" } }
   & $wrapper --data-dir $Data config set modalities $mods | Out-Null
   & $wrapper --data-dir $Data config set max_data_mb $dataMb | Out-Null
   & $wrapper --data-dir $Data config set pack_tiers $tiers | Out-Null

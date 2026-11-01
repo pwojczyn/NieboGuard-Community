@@ -11,7 +11,8 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from nieboguard_compute.audio import FEATURE_DIM, load_audio_dataset, wav_features
-from nieboguard_compute.model import TrainConfig, export_artifact, train_audio
+from nieboguard_compute.model import TrainConfig, export_artifact, load_base_tensors, train_audio
+from nieboguard_compute.safetensors import Tensor, write_safetensors
 from nieboguard_compute.safetensors import read_safetensors
 
 
@@ -35,6 +36,34 @@ def noisy(freq: float, seconds: float = 1.0, rate: int = 16000, seed: int = 1) -
 
 
 class AudioTrainingTest(unittest.TestCase):
+    def test_base_artifact_is_loaded(self):
+        specs = [
+            {"name": "backbone.weight", "shape": [FEATURE_DIM, 4], "dtype": "F32"},
+            {"name": "backbone.bias", "shape": [4], "dtype": "F32"},
+            {"name": "classifier.weight", "shape": [4, 2], "dtype": "F32"},
+            {"name": "classifier.bias", "shape": [2], "dtype": "F32"},
+        ]
+        values = {}
+        for spec in specs:
+            n = 1
+            for d in spec["shape"]:
+                n *= d
+            values[spec["name"]] = Tensor(spec["name"], spec["shape"], [0.123] * n)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "base.safetensors"
+            path.write_bytes(write_safetensors(values, {"base": "yes"}))
+            loaded = load_base_tensors(specs, path)
+            self.assertAlmostEqual(loaded["classifier.bias"].values[0], 0.123, places=5)
+            self.assertAlmostEqual(loaded["classifier.bias"].values[1], 0.123, places=5)
+
+    def test_manifest_shard_split_overrides_missing_row_split(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            row = {"features": [0.0] * FEATURE_DIM, "label": "drone"}
+            (root / "val.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+            data = load_audio_dataset(root, FEATURE_DIM, ["drone", "bird"], {"val.jsonl": "validation"})
+            self.assertEqual(data[0]["split"], "validation")
+
     def test_features_are_finite_and_stable(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "a.wav"
@@ -85,6 +114,14 @@ class AudioTrainingTest(unittest.TestCase):
             )
             result2 = train_audio(data, specs, cfg2)
             self.assertGreaterEqual(result2["metrics"]["epochs_completed"], 3)
+            stopped = train_audio(data, specs, TrainConfig(
+                task_id="task-audio", round_id="round-1", base_model="base", base_version="0.1",
+                architecture_hash="arch", classes=["drone", "bird"], epochs=100, batch_size=8,
+                learning_rate=0.05, max_steps=100, max_seconds=30,
+                checkpoint=root / "stop.safetensors", resume=False,
+                should_stop=lambda: True,
+            ))
+            self.assertTrue(stopped["stopped"])
 
 
 if __name__ == "__main__":

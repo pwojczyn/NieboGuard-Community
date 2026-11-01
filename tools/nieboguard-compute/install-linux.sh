@@ -88,7 +88,7 @@ cat > "$ROOT/bin/nieboguard-compute" <<'EOF'
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
-exec "$ROOT/.venv/bin/python" -m nieboguard_compute "$@"
+exec "$ROOT/.venv/bin/python" -m nieboguard_compute --data-dir "$ROOT/data" "$@"
 EOF
 chmod +x "$ROOT/bin/nieboguard-compute"
 
@@ -121,7 +121,7 @@ if [[ -t 0 && "$ASSUME_YES" != "1" && "${NIEBOGUARD_COMPUTE_NONINTERACTIVE:-0}" 
   case "${SCHED:-manual}" in manual|idle|always) ;; *) SCHED="manual" ;; esac
   read -r -p "Maks. paczka danych MB [50/200/500/1024] (domyślnie 200): " DATA_MB || DATA_MB=""
   DATA_MB="${DATA_MB:-200}"
-  case "$DATA_MB" in 50) TIERS="MINI" ;; 500) TIERS="MINI,STANDARD,EXTENDED" ;; 1024) TIERS="GPU" ;; *) DATA_MB="200"; TIERS="MINI,STANDARD" ;; esac
+  case "$DATA_MB" in 50) TIERS="MINI" ;; 500) TIERS="MINI,STANDARD,EXTENDED" ;; 1024) TIERS="MINI,STANDARD,EXTENDED,GPU" ;; *) DATA_MB="200"; TIERS="MINI,STANDARD" ;; esac
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set modalities "$MODS" >/dev/null || true
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set max_data_mb "$DATA_MB" >/dev/null || true
   "$ROOT/bin/nieboguard-compute" --data-dir "$CONFIG_DIR" config set pack_tiers "$TIERS" >/dev/null || true

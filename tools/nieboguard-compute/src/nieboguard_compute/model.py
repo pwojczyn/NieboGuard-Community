@@ -110,6 +110,9 @@ class TrainConfig:
     max_steps: int = 2000
     max_seconds: int = 1800
     cpu_percent: int = 50
+    max_gpu_percent: int = 60
+    should_stop: Any = None
+    base_artifact: Path | None = None
     checkpoint: Path | None = None
     resume: bool = True
     backend: str = "python"
@@ -186,6 +189,20 @@ def _split(data: list[dict[str, Any]], seed: int) -> tuple[list[dict[str, Any]],
     return train, val
 
 
+def load_base_tensors(specs: list[dict[str, Any]], path: Path) -> dict[str, Tensor]:
+    tensors, _meta = read_safetensors(path.read_bytes())
+    out: dict[str, Tensor] = {}
+    for spec in specs:
+        name = str(spec["name"])
+        tensor = tensors.get(name)
+        if tensor is None:
+            raise TrainingError(f"base artifact is missing tensor {name}")
+        if tensor.shape != [int(x) for x in spec["shape"]]:
+            raise TrainingError(f"base artifact shape mismatch for {name}")
+        out[name] = Tensor(name=name, shape=tensor.shape, values=tensor.values)
+    return out
+
+
 def _spec_map(specs: list[dict[str, Any]]) -> dict[str, list[int]]:
     return {str(s["name"]): [int(x) for x in s["shape"]] for s in specs}
 
@@ -240,6 +257,8 @@ def train_audio(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: Tr
         if row.get("label") not in classes:
             raise TrainingError(f"nieznana etykieta: {row.get('label')}")
     tensors = deterministic_init(specs, cfg.seed)
+    if cfg.base_artifact and cfg.base_artifact.exists():
+        tensors = load_base_tensors(specs, cfg.base_artifact)
     start_epoch = 0
     best = -1.0
     if cfg.checkpoint and cfg.checkpoint.exists() and cfg.resume:
@@ -262,7 +281,7 @@ def train_audio(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: Tr
         total_loss = 0.0
         seen = 0
         for start in range(0, len(order), max(1, cfg.batch_size)):
-            if budget.expired() or steps >= cfg.max_steps:
+            if budget.expired() or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
                 break
             batch = [train[i] for i in order[start:start + max(1, cfg.batch_size)]]
             grads = _zero_grads(shapes)
@@ -298,7 +317,7 @@ def train_audio(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: Tr
         if acc > best:
             best = acc
         save_checkpoint(cfg, tensors, epochs_done, best, len(train) + len(val), cfg.backend, cfg.device)
-        if budget.expired() or steps >= cfg.max_steps:
+        if budget.expired() or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
             break
     acc, val_loss = evaluate_audio(tensors, val, classes)
     return {
@@ -307,6 +326,7 @@ def train_audio(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: Tr
                     "duration_s": round(time.monotonic() - budget.start_wall, 3), "epochs_completed": epochs_done,
                     "backend": cfg.backend, "resumed": start_epoch > 0},
         "history": history, "validation_size": len(val),
+        "stopped": bool(cfg.should_stop and cfg.should_stop()),
     }
 
 
@@ -382,6 +402,8 @@ def train_vision(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: T
             if not isinstance(row.get("box"), (list, tuple)) or len(row["box"]) != 4:
                 raise TrainingError("brak box dla obiektu dodatniego")
     tensors = deterministic_init(specs, cfg.seed)
+    if cfg.base_artifact and cfg.base_artifact.exists():
+        tensors = load_base_tensors(specs, cfg.base_artifact)
     start_epoch = 0
     best = -1.0
     if cfg.checkpoint and cfg.checkpoint.exists() and cfg.resume:
@@ -404,7 +426,7 @@ def train_vision(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: T
         total_loss = 0.0
         seen = 0
         for start in range(0, len(order), max(1, cfg.batch_size)):
-            if budget.expired() or steps >= cfg.max_steps:
+            if budget.expired() or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
                 break
             batch = [train[i] for i in order[start:start + max(1, cfg.batch_size)]]
             grads = _zero_grads(shapes)
@@ -474,7 +496,7 @@ def train_vision(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: T
         if metrics["objectness_f1"] > best:
             best = metrics["objectness_f1"]
         save_checkpoint(cfg, tensors, epochs_done, best, len(train) + len(val), cfg.backend, cfg.device)
-        if budget.expired() or steps >= cfg.max_steps:
+        if budget.expired() or steps >= cfg.max_steps or (cfg.should_stop and cfg.should_stop()):
             break
     metrics = evaluate_vision(tensors, val, cfg.classes)
     return {
@@ -484,6 +506,7 @@ def train_vision(data: list[dict[str, Any]], specs: list[dict[str, Any]], cfg: T
                     "duration_s": round(time.monotonic() - budget.start_wall, 3), "epochs_completed": epochs_done,
                     "backend": cfg.backend, "resumed": start_epoch > 0},
         "history": history, "validation_size": len(val),
+        "stopped": bool(cfg.should_stop and cfg.should_stop()),
     }
 
 

@@ -21,12 +21,13 @@ class VisionError(ValueError):
     pass
 
 
-def load_vision_dataset(data_dir: Path, input_dim: int, classes: list[str]) -> list[dict[str, Any]]:
+def load_vision_dataset(data_dir: Path, input_dim: int, classes: list[str], split_by_file: dict[str, str] | None = None) -> list[dict[str, Any]]:
     files = sorted(p for p in data_dir.iterdir() if p.is_file() and p.suffix.lower() == ".jsonl")
     if not files:
         raise VisionError("Brak pliku JSONL z propozycjami vision.")
     rows: list[dict[str, Any]] = []
     for label_file in files:
+        default_split = (split_by_file or {}).get(label_file.name, "train")
         for line_no, line in enumerate(label_file.read_text(encoding="utf-8").splitlines(), 1):
             line = line.strip()
             if not line:
@@ -73,7 +74,7 @@ def load_vision_dataset(data_dir: Path, input_dim: int, classes: list[str]) -> l
                 box = [0.0, 0.0, 0.0, 0.0]
             rows.append({
                 "features": values, "objectness": objectness, "label": label, "box": box,
-                "split": str(item.get("split") or "train"),
+                "split": default_split if split_by_file else str(item.get("split") or "train"),
                 "group": str(item.get("group") or label_file.stem),
             })
             if len(rows) > MAX_RECORDS:

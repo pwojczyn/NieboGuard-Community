@@ -15,7 +15,7 @@ pozostaje w prywatnym repozytorium; jego status nie jest publikowany tutaj.
 - [x] lokalny agent start/stop/resume tylko na loopbacku,
 - [x] limity CPU/GPU, harmonogram bezczynności i limit danych,
 - [x] safetensors, bez pickle i wykonywalnych checkpointów,
-- [x] testy jednostkowe klienta (30 testów).
+- [x] testy jednostkowe klienta (32 testów).
 
 ## Częściowe / wymaga potwierdzenia
 

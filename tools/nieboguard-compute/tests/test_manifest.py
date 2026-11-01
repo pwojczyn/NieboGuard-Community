@@ -90,6 +90,10 @@ class ManifestTest(unittest.TestCase):
         with self.assertRaises(ManifestError):
             validate_manifest(manifest, None, "https://api.neboguard.pl", allow_unsigned=True,
                               max_data_mb=50, allowed_tiers=["GPU"])
+        no_pack = base_manifest()
+        no_pack["dataset"]["shards"][0]["bytes"] = 60_000_000
+        with self.assertRaises(ManifestError):
+            validate_manifest(no_pack, None, "https://api.neboguard.pl", allow_unsigned=True, max_data_mb=50)
 
     def test_positive_signature(self):
         try:

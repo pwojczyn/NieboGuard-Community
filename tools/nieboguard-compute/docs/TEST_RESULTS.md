@@ -10,7 +10,7 @@ cd tools/nieboguard-compute
 python -m unittest discover -s tests -v
 ```
 
-Wynik: **30 testów, OK**.
+Wynik: **32 testów, OK**.
 
 Zakres:
 
