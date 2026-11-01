@@ -88,7 +88,11 @@ dużym dyskiem. Instrukcja: [`docs/ACADEMIC_PACK_PIPELINE.md`](docs/ACADEMIC_PAC
 
 ```bash
 ./academic/prepare-pack-linux.sh --help
+./academic/prepare-audio-pack-linux.sh --help
 ```
+
+Audio AI: normalizacja 16 kHz mono, segmenty, filtr ciszy/clippingu,
+deduplikacja SHA-256. Szczegóły: [`docs/AUDIO_AI_DATA.md`](docs/AUDIO_AI_DATA.md).
 
 ## Bezpieczeństwo
 

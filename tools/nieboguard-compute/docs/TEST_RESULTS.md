@@ -10,7 +10,7 @@ cd tools/nieboguard-compute
 python -m unittest discover -s tests -v
 ```
 
-Wynik: **35 testów, OK**.
+Wynik: **36 testów, OK**.
 
 Zakres:
 
@@ -25,7 +25,8 @@ Zakres:
   base artifact, stop bez uploadu,
 - Vision AI: głowa detekcji CPU, objectness F1 ≥ 0.8, eksport safetensors,
 - canonical JSON dla `1e-5`/`1e-6`/`1e-7`/`1e20`/`1e21`,
-- przygotowanie paczek: ZIP/TAR, zip-slip, absolute path, grupy sesji, manifest.
+- przygotowanie paczek: ZIP/TAR, zip-slip, absolute path, grupy sesji, manifest,
+- Audio AI: normalizacja, segmentacja, filtr ciszy, deduplikacja.
 - limit danych bez paczki i dozwolone klasy paczek.
 
 ## Instalator Linux

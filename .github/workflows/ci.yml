@@ -34,7 +34,7 @@ jobs:
           bash -n tools/nieboguard-compute/install-linux.sh
           bash -n tools/nieboguard-compute/start-linux.sh
           bash -n tools/nieboguard-compute/uninstall-linux.sh
-          python -m py_compile tools/nieboguard-compute/src/nieboguard_compute/*.py tools/nieboguard-compute/academic/prepare_academic_pack.py
+          python -m py_compile tools/nieboguard-compute/src/nieboguard_compute/*.py tools/nieboguard-compute/academic/prepare_academic_pack.py tools/nieboguard-compute/academic/prepare_audio_pack.py
       - name: NieboGuard Compute PowerShell syntax
         shell: pwsh
         run: |

@@ -15,8 +15,9 @@ pozostaje w prywatnym repozytorium; jego status nie jest publikowany tutaj.
 - [x] lokalny agent start/stop/resume tylko na loopbacku,
 - [x] limity CPU/GPU, harmonogram bezczynności i limit danych,
 - [x] lokalne przygotowanie paczek akademickich z SHA-256 i bezpiecznym rozpakowaniem,
+- [x] pipeline Audio AI: 16 kHz mono, segmenty, filtr jakości i dedup,
 - [x] safetensors, bez pickle i wykonywalnych checkpointów,
-- [x] testy jednostkowe klienta (35 testów).
+- [x] testy jednostkowe klienta (36 testów).
 
 ## Częściowe / wymaga potwierdzenia
 

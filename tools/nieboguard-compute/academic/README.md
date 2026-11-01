@@ -22,6 +22,15 @@ Pełna instrukcja: [`docs/ACADEMIC_PACK_PIPELINE.md`](../../docs/ACADEMIC_PACK_P
   --min-free-gb 10
 ```
 
+## Audio AI
+
+```bash
+./academic/prepare-audio-pack-linux.sh --help
+```
+
+Normalizacja 16 kHz mono, segmenty, filtr ciszy/clippingu, deduplikacja i
+paczki. Szczegóły: [`docs/AUDIO_AI_DATA.md`](../docs/AUDIO_AI_DATA.md).
+
 ## Upload do R2
 
 ```bash

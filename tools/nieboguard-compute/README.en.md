@@ -73,7 +73,11 @@ can upload small shards to R2. Full archives stay on a large local disk. See
 
 ```bash
 ./academic/prepare-pack-linux.sh --help
+./academic/prepare-audio-pack-linux.sh --help
 ```
+
+Audio AI: 16 kHz mono normalisation, segmentation, silence/clipping filter and
+SHA-256 dedup. See [`docs/AUDIO_AI_DATA.md`](docs/AUDIO_AI_DATA.md).
 
 ## Security
 

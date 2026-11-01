@@ -4,6 +4,7 @@
   i statusy źródeł akademickich.
 - [`ACADEMIC_PACK_PIPELINE.md`](ACADEMIC_PACK_PIPELINE.md) — lokalne pobieranie,
   rozpakowanie i przygotowanie paczek.
+- [`AUDIO_AI_DATA.md`](AUDIO_AI_DATA.md) — pipeline Audio AI i ile danych potrzeba.
 - [`DATA_PACKS.md`](DATA_PACKS.md) — MINI/STANDARD/EXTENDED/GPU, deduplikacja,
   przydział i split po sesjach.
 - [`MODELS.md`](MODELS.md) — audyt modeli Audio AI/Vision AI i ograniczenia YAMNet.
