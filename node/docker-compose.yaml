@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  nieboguard-node:
+    image: pwojczyn/nieboguard-node:latest
+    container_name: nieboguard-node
+    restart: unless-stopped
+    environment:
+      - NB_NODE_CONFIG=/app/configs/default.yaml
+      - NB_NODE_WORKDIR=/data
+      - NB_NODE_HOST=0.0.0.0
+      - NB_NODE_PORT=8787
+    volumes:
+      - ./data:/data
+      - ./configs:/app/configs
+      - ./logs:/logs
+    ports:
+      - "8787:8787"
+      - "8887:8887"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8787/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M

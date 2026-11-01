@@ -1,0 +1,14 @@
+port: 8787
+host: 127.0.0.1
+workdir: ~/.nieboguard
+verbose: false
+sources:
+  local_adsb:
+    enabled: true
+    name: "Local ADS-B"
+  http_json:
+    enabled: false
+    name: "HTTP JSON Polling"
+  rss_atom:
+    enabled: false
+    name: "RSS/Atom Feed"

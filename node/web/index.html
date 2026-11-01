@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NieboGuard Node</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .navbar {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .navbar nav a {
+            color: #4ecdc4;
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+        }
+        .navbar nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .stat-card {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1565c0;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .source-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .source-item:last-child {
+            border-bottom: none;
+        }
+        .source-name {
+            font-weight: 500;
+        }
+        .source-status {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        .status-active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: 0.4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+        input:checked + .slider { background-color: #2196f3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .map-placeholder {
+            background: #e3f2fd;
+            height: 300px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .language-selector {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .error-box {
+            background: #ffebee;
+            border-left: 4px solid #c62828;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #f57c00;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .language-pl {
+            display: none;
+        }
+        .language-en {
+            display: block;
+        }
+        body[data-lang="pl"] .language-pl { display: block; }
+        body[data-lang="pl"] .language-en { display: none; }
+    </style>
+</head>
+<body data-lang="en">
+    <nav class="navbar">
+        <h1>NieboGuard Node</h1>
+        <nav>
+            <a href="#" data-lang="pl" class="language-pl">Panel</a>
+            <a href="#" data-lang="en" class="language-en">Panel</a>
+            <a href="#sources" data-lang="pl" class="language-pl">Źródła</a>
+            <a href="#sources" data-lang="en" class="language-en">Sources</a>
+            <a href="#map" data-lang="pl" class="language-pl">Mapa</a>
+            <a href="#map" data-lang="en" class="language-en">Map</a>
+            <a href="#history" data-lang="pl" class="language-pl">Historia</a>
+            <a href="#history" data-lang="en" class="language-en">History</a>
+            <a href="#settings" data-lang="pl" class="language-pl">Ustawienia</a>
+            <a href="#settings" data-lang="en" class="language-en">Settings</a>
+            <a href="#" id="lang-toggle">PL/EN</a>
+        </nav>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2 data-lang="pl" class="language-pl">Dashboard</h2>
+            <h2 data-lang="en" class="language-en">Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-sources">0</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Źródła aktywne</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Active Sources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-objects">0</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Obiekty</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Objects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-notices">0</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Komunikaty</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Notices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-status">Lokalny</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Tryb pracy</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Operation Mode</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <strong data-lang="pl" class="language-pl">Uwaga:</strong>
+            <strong data-lang="en" class="language-en">Notice:</strong>
+            <span data-lang="pl" class="language-pl">NieboGuard Node nie jest oficjalnym systemem ostrzegania. Dane mogą być opóźnione lub niepełne.</span>
+            <span data-lang="en" class="language-en">NieboGuard Node is not an official warning system. Data may be delayed or incomplete.</span>
+        </div>
+
+        <div id="sources" class="card">
+            <h2 data-lang="pl" class="language-pl">Źródła danych</h2>
+            <h2 data-lang="en" class="language-en">Data Sources</h2>
+            <div id="sources-list"></div>
+        </div>
+
+        <div id="map" class="card">
+            <h2 data-lang="pl" class="language-pl">Mapa lokalna</h2>
+            <h2 data-lang="en" class="language-en">Local Map</h2>
+            <div class="map-placeholder">
+                <span data-lang="pl" class="language-pl">Mapa dostępna lokalnie (dane z sensorów)</span>
+                <span data-lang="en" class="language-en">Local map (sensor data)</span>
+            </div>
+        </div>
+
+        <div id="history" class="card">
+            <h2 data-lang="pl" class="language-pl">Historia obserwacji</h2>
+            <h2 data-lang="en" class="language-en">Observation History</h2>
+            <div id="history-list"></div>
+        </div>
+
+        <div id="settings" class="card">
+            <h2 data-lang="pl" class="language-pl">Ustawienia</h2>
+            <h2 data-lang="en" class="language-en">Settings</h2>
+            <p data-lang="pl" class="language-pl">Port nasłuchiwania: <strong id="config-port">8787</strong></p>
+            <p data-lang="en" class="language-en">Listen port: <strong id="config-port">8787</strong></p>
+            <p data-lang="pl" class="language-pl">Język interfejsu</p>
+            <p data-lang="en" class="language-en">Interface language</p>
+            <select class="language-selector" id="lang-select">
+                <option value="en" data-lang="pl" class="language-pl">Angielski</option>
+                <option value="en" data-lang="en" class="language-en">English</option>
+                <option value="pl" data-lang="pl" class="language-pl">Polski</option>
+                <option value="pl" data-lang="en" class="language-en">Polish</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        // Language toggle
+        document.getElementById('lang-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            const html = document.body;
+            const currentLang = html.getAttribute('data-lang');
+            const newLang = currentLang === 'en' ? 'pl' : 'en';
+            html.setAttribute('data-lang', newLang);
+        });
+
+        // Language selector
+        document.getElementById('lang-select').addEventListener('change', function() {
+            document.body.setAttribute('data-lang', this.value);
+        });
+
+        // Load data from API
+        async function loadData() {
+            try {
+                const response = await fetch('/api/v1/sources');
+                if (response.ok) {
+                    const data = await response.json();
+                    renderSources(data);
+                }
+            } catch (err) {
+                console.error('Failed to load sources:', err);
+            }
+        }
+
+        function renderSources(data) {
+            const container = document.getElementById('sources-list');
+            if (!data || !data.length) {
+                container.innerHTML = '<p>No sources configured</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(source => `
+                <div class="source-item">
+                    <div>
+                        <div class="source-name">${source.name || source.id}</div>
+                        <div style="font-size:0.8rem;color:#666">${source.type}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1rem">
+                        <span class="source-status ${source.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${source.status || 'inactive'}
+                        </span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${source.status === 'active' ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        loadData();
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

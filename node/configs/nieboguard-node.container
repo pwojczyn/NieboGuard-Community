@@ -1,0 +1,36 @@
+[Container]
+# NieboGuard Node container image
+Image=pwojczyn/nieboguard-node:latest
+
+# Restart policy
+restart=unless-stopped
+
+# User configuration (rootless)
+User=root
+
+# Environment variables
+Env=NB_NODE_CONFIG=/etc/nieboguard/default.yaml
+Env=NB_NODE_WORKDIR=/var/lib/nieboguard
+Env=NB_NODE_HOST=127.0.0.1
+Env=NB_NODE_PORT=8787
+
+# Resource limits
+Memory=512M
+CPUQuota=200000
+
+# Mount persistent data
+Mount=/var/lib/nieboguard:ro
+Mount=/etc/nieboguard:/etc/nieboguard:ro
+
+# Network configuration
+Network=podman
+
+# Health check
+Healthcheck=/usr/local/bin/nnode --verbose 2>/dev/null || exit 1
+
+# Auto-update disabled by default
+# AutoUpdate=no
+
+# Logging options
+LogOpts.max-size=50m
+LogOpts.max-file=3
