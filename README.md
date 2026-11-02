@@ -82,3 +82,15 @@
 ## Technical Focus
 
 Real-time systems, geospatial data, AI, aviation tracking. All synthetic data clearly marked (`simulated=true`). Educational profiles only.
+
+## Test APK
+
+[`releases/`](releases/README.md) zawiera testowy build Android:
+
+- `nieboguard-dev-0.1.2-beta-debug.apk`,
+- `pl.nieboguard.app.dev`, debug-signed, nie release,
+- SHA-256 w [`releases/SHA256SUMS`](releases/SHA256SUMS).
+
+FCM jest w kliencie, ale backend jest wyłączony do testów. Wi-Fi NAN wymaga
+telefonu z Wi-Fi Aware. To nie jest oficjalny system ostrzegania.
+
