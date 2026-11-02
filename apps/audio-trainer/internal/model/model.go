@@ -29,6 +29,7 @@ const (
 	StatusTraining   Status = "training"
 	StatusEvaluating Status = "evaluating"
 	StatusError      Status = "error"
+	StatusPaused     Status = "paused"
 )
 
 type ModelEntry struct {
@@ -122,6 +123,24 @@ func (mm *ModelManager) Status() Status {
 	mm.mu.RLock()
 	defer mm.mu.RUnlock()
 	return mm.status
+}
+
+func (mm *ModelManager) SetStatus(s Status) {
+	mm.mu.Lock()
+	defer mm.mu.Unlock()
+	mm.status = s
+}
+
+func (mm *ModelManager) Pause() error {
+	mm.mu.Lock()
+	defer mm.mu.Unlock()
+
+	if mm.status != StatusTraining {
+		return fmt.Errorf("cannot pause from status %s", mm.status)
+	}
+
+	mm.status = StatusPaused
+	return nil
 }
 
 func (mm *ModelManager) GetInfo() interface{} {

@@ -20,6 +20,7 @@ import (
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/dataset"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/model"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/r2"
+	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/secure"
 )
 
 func main() {
@@ -71,19 +72,20 @@ func main() {
 	}
 
 	// Create compute client (R2 integration)
-	computeClient, err := compute.NewClient(cfg.Compute.ServerURL, cfg.Compute.Token, cfg.Compute.StationID)
+	credStore := secure.DefaultCredentialStore(filepath.Join(cfg.WorkDir, "credentials.store"))
+	computeClient, err := compute.NewClient(cfg.Compute.ServerURL, cfg.Compute.StationID, "compute_token_key", credStore)
 	if err != nil {
 		log.Fatalf("Failed to create compute client: %v", err)
 	}
 
 	// Create dataset manager
-	datasetManager, err := dataset.New(cfg.Dataset)
+	datasetManager, err := dataset.New(cfg)
 	if err != nil {
 		log.Fatalf("Failed to create dataset manager: %v", err)
 	}
 
 	// Create model manager
-	modelManager, err := model.New(cfg.Model)
+	modelManager, err := model.New(cfg)
 	if err != nil {
 		log.Fatalf("Failed to create model manager: %v", err)
 	}
@@ -99,8 +101,8 @@ func main() {
 
 	// Start background processes
 	ctx, cancel := context.WithCancel(context.Background())
-	go dashboard.collectMetrics()
-	go dashboard.processTrainingEvents()
+	go dashboard.CollectMetrics()
+	go dashboard.ProcessTrainingEvents()
 
 	// Start API server
 	go func() {
