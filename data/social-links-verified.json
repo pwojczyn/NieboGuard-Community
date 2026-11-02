@@ -1,52 +1,26 @@
-# Official NieboGuard Social Media & Channels — Verified 2026-11-02
-
-## Verified (direct sources)
-
-- **Website / Official App**: https://nieboguard.pl/
-- **GitHub Community**: https://github.com/pwojczyn/NieboGuard-Community
-- **GitHub Profile**: https://github.com/pwojczyn
-- **Release v1.0.0**: https://github.com/pwojczyn/NieboGuard-Community/releases/tag/v1.0.0
-- **Documentation / KB**: https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/knowledge-base
-- **Protocol Lab**: https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/protocol-lab
-- **Status page**: https://nieboguard.pl/status
-- **Contact / Issue reporting**: https://github.com/pwojczyn/NieboGuard-Community/issues (GitHub Issues) + /contact on site
-- **Privacy**: https://nieboguard.pl/privacy
-- **Terms**: https://nieboguard.pl/terms
-- **Guide**: https://nieboguard.pl/guide
-- **Objects / Map**: https://nieboguard.pl/objects / https://nieboguard.pl/
-
-## Referenced in site licenses (not direct URLs verified)
-
-From `/licenses` page (verified 2026-11-02):
-
-> "Meta, X, Telegram, Sociamonials/Kontentowo — publikacja i kanały społecznościowe"
-
-These platforms are **mentioned as services used** by NieboGuard, not necessarily as official profiles with direct URLs on the site. **Direct profile URLs must be verified manually** by checking the platforms themselves or by asking the author directly.
-
-- **Meta** (Facebook / Instagram): NOT VERIFIED — no direct URL on site
-- **X / Twitter**: NOT VERIFIED — no direct URL on site  
-- **Telegram**: NOT VERIFIED — no direct URL on site
-- **YouTube**: NOT VERIFIED — not mentioned in licenses page
-- **TikTok**: NOT VERIFIED — not mentioned in licenses page
-- **Sociamonials / Kontentowo**: NOT VERIFIED — service provider, not public profile
-
-## How to verify
-
-Check manually:
-- https://youtube.com/@NieboGuard or /NieboGuard
-- https://facebook.com/NieboGuard
-- https://instagram.com/NieboGuard
-- https://tiktok.com/@NieboGuard
-- https://x.com/NieboGuard
-- https://t.me/NieboGuard
-
-Only add verified URLs to READMEs once confirmed.
-
-## Important disclaimers
-
-- **Not an official state warning system** — all data is synthetic
-- **All synthetic observations** marked `simulated=true`
-- **Educational military profiles only** — not compliant with real standards
-- **No real Link 16 transmission** implemented
-- **No unauthorized encoders** used
-- **No production secrets** copied from `/etc/nieboguard/live.env`
+{
+  "verified": {
+    "website": "https://nieboguard.pl/",
+    "github_profile": "https://github.com/pwojczyn",
+    "github_community": "https://github.com/pwojczyn/NieboGuard-Community",
+    "github_tag": "https://github.com/pwojczyn/NieboGuard-Community/releases/tag/v1.0.0",
+    "release_notes": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/CHANGELOG.md",
+    "docs_install": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md",
+    "docs_readme": "https://github.com/pwojczyn/NieboGuard-Community",
+    "docs_knowledge_base": "https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/knowledge-base",
+    "docs_protocol_lab": "https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/protocol-lab"
+  },
+  "social_media_verified": {
+    "telegram": "https://t.me/NieboGuard",
+    "facebook": "https://www.facebook.com/nieboguard",
+    "instagram": "https://www.instagram.com/nieboguard/"
+  },
+  "social_media_unverified": {
+    "youtube": "NOT_VERIFIED",
+    "x_twitter": "NOT_VERIFIED", 
+    "tiktok": "NOT_VERIFIED"
+  },
+  "verified_date": "2026-11-02",
+  "source": "Direct verification from https://nieboguard.pl/ HTML source (extracted via grep on page content)",
+  "note": "Telegram (t.me/NieboGuard), Facebook (facebook.com/nieboguard), Instagram (instagram.com/nieboguard/) are verified from website source. YouTube, X/Twitter, TikTok were NOT FOUND on site - unverified status maintained."
+}

@@ -1,43 +1,22 @@
 {
-  "verified_2026_11_02": {
-    "website": "https://nieboguard.pl/",
-    "github_profile": "https://github.com/pwojczyn",
-    "github_community": "https://github.com/pwojczyn/NieboGuard-Community",
-    "github_tag": "https://github.com/pwojczyn/NieboGuard-Community/releases/tag/v1.0.0",
-    "release_notes": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/CHANGELOG.md",
-    "docs_install": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md",
-    "docs_readme": "https://github.com/pwojczyn/NieboGuard-Community", 
-    "docs_knowledge_base": "https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/knowledge-base",
-    "docs_protocol_lab": "https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/protocol-lab"
+  "website": "https://nieboguard.pl/",
+  "github_profile": "https://github.com/pwojczyn",
+  "github_community": "https://github.com/pwojczyn/NieboGuard-Community",
+  "github_tag": "https://github.com/pwojczyn/NieboGuard-Community/releases/tag/v1.0.0",
+  "release_notes": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/CHANGELOG.md",
+  "docs_install": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md",
+  "docs_readme": "https://github.com/pwojczyn/NieboGuard-Community",
+  "docs_knowledge_base": "https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/knowledge-base",
+  "docs_protocol_lab": "https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/protocol-lab",
+  "social_media": {
+    "telegram": "https://t.me/NieboGuard",
+    "facebook": "https://www.facebook.com/nieboguard",
+    "instagram": "https://www.instagram.com/nieboguard/",
+    "youtube": "NOT_VERIFIED",
+    "x_twitter": "NOT_VERIFIED",
+    "tiktok": "NOT_VERIFIED"
   },
-  "from_website_inspection_2026_11_02": {
-    "map": "https://nieboguard.pl/",
-    "ar_sky_scanner": "https://nieboguard.pl/ar/",
-    "safety_neighborhood": "https://nieboguard.pl/ar/safety/",
-    "community_reports": "https://nieboguard.pl/ar/safety/",
-    "obs_lotnicze": "https://nieboguard.pl/obserwacje-lotnicze/",
-    "narzedzia": "https://nieboguard.pl/narzedzia/",
-    "komunikaty": "https://nieboguard.pl/komunikaty/",
-    "wiedza": "https://nieboguard.pl/wiedza/",
-    "guide": "https://nieboguard.pl/guide",
-    "objects": "https://nieboguard.pl/objects",
-    "privacy": "https://nieboguard.pl/privacy",
-    "terms": "https://nieboguard.pl/terms",
-    "cookies": "https://nieboguard.pl/cookies",
-    "licenses": "https://github.com/pwojczyn/NieboGuard-Community/blob/main/LICENSE",
-    "contact": "https://nieboguard.pl/contact",
-    "status": "https://nieboguard.pl/status"
-  },
-  "social_media_needs_verification": {
-    "youtube": "NOT_VERIFIED — search pwojczyn/NieboGuard",
-    "facebook": "NOT_VERIFIED — search NieboGuard PL",
-    "instagram": "NOT_VERIFIED — search NieboGuard",
-    "tiktok": "NOT_VERIFIED — search NieboGuard",
-    "x_twitter": "NOT_VERIFIED — search @NieboGuard",
-    "telegram": "NOT_VERIFIED — search NieboGuard channel"
-  },
-  "note": "Social links for YouTube/FB/IG/TikTok/X/Telegram must be verified manually from official sources (nee public footer, app settings). Do NOT invent URLs.",
   "verified_date": "2026-11-02",
-  "audit_scope": "Website content extracted from https://nieboguard.pl/ via webfetch. No private admin panel accessed. All public functions listed.",
-  "disclaimer": "NieboGuard is NOT an official state warning system. Educational simulation only. All synthetic data clearly marked simulated=true."
+  "source": "HTML source of https://nieboguard.pl/ (verified via curl grep)",
+  "note": "Telegram, Facebook, Instagram verified from page source. YouTube, X/Twitter, TikTok not found on site - must verify manually if they exist."
 }

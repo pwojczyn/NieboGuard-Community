@@ -30,16 +30,24 @@
 | 📋 Roadmap | https://github.com/pwojczyn/NieboGuard-Community/blob/main/ROADMAP.md | ✅ |
 | 📘 Installation Guide | https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md | ✅ |
 
-**Social media (nie zweryfikowane — wymagają ręcznej weryfikacji):**
+**Social media (verified from site source 2026-11-02):**
 
-- YouTube — `NOT_VERIFIED`
-- Facebook — `NOT_VERIFIED`
-- Instagram — `NOT_VERIFIED`
-- X / Twitter — `NOT_VERIFIED`
-- TikTok — `NOT_VERIFIED`
-- Telegram — `NOT_VERIFIED`
+| Platforma | Link | Status |
+|-----------|------|--------|
+| 🌐 Strona WWW | https://nieboguard.pl/ | ✅ Zweryfikowane |
+| 📊 GitHub Community | https://github.com/pwojczyn/NieboGuard-Community | ✅ Zweryfikowane |
+| 👤 Autor Profile | https://github.com/pwojczyn | ✅ Zweryfikowane |
+| 🏷️ Tag v1.0.0 | https://github.com/pwojczyn/NieboGuard-Community/releases/tag/v1.0.0 | ✅ Wypchnięty |
+| 📚 Knowledge Base | https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/knowledge-base | ✅ Zweryfikowane |
+| 🧪 Protocol Lab | https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/protocol-lab | ✅ Zweryfikowane |
+| 📜 CHANGELOG | https://github.com/pwojczyn/NieboGuard-Community/blob/main/CHANGELOG.md | ✅ |
+| 📋 Roadmap | https://github.com/pwojczyn/NieboGuard-Community/blob/main/ROADMAP.md | ✅ |
+| 📘 Installation Guide | https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md | ✅ |
+| 🌐 Telegram | https://t.me/NieboGuard | ✅ Zweryfikowane |
+| 📘 Facebook | https://www.facebook.com/nieboguard | ✅ Zweryfikowane |
+| 📸 Instagram | https://www.instagram.com/nieboguard/ | ✅ Zweryfikowane |
 
-> **Uwaga:** Kanały social media wymagają ręcznej weryfikacji przed dodaniem. Nie zgadywano URL-i — wpisano jako `NOT_VERIFIED` w `data/social-links.json`.
+> **Uwaga:** Kanały YouTube, X/Twitter i TikTok nie zostały znalezione na stronie oficjalnej. Sprawdź ręcznie, czy istnieją profile oficjalne NieboGuard na tych platformach.
 
 ---
 
