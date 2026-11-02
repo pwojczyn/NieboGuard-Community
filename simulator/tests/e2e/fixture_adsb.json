@@ -1,0 +1,27 @@
+{
+  "simulated": true,
+  "type": "adsb-fixture",
+  "aircraft": [
+    {
+      "hex": "abc123",
+      "flight": "TEST001",
+      "lat": 52.1234,
+      "lon": 19.2345,
+      "alt_baro": 32000,
+      "track": 90.0,
+      "speed": 450.0,
+      "simulated": true
+    },
+    {
+      "hex": "def456",
+      "flight": "TEST002",
+      "lat": 51.9876,
+      "lon": 20.4567,
+      "alt_baro": 28000,
+      "track": 180.0,
+      "speed": 420.0,
+      "simulated": true
+    }
+  ],
+  "note": "Educational simulation - synthetic ADS-B data for E2E pipeline test"
+}

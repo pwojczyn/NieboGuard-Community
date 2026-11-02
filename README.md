@@ -6,74 +6,26 @@ Open source sensor hub and protocol lab for flight data, weather, and marine tra
 
 NieboGuard Community consists of two main projects:
 
-1. **NieboGuard Sensor Hub** (Sensor Hub) — adapter-driven server for ingesting and serving data from various aviation, weather, and marine sensors.
+1. **NieboGuard Sensor Hub** (Sensor Hub) — open-source adapter-driven server for aviation, weather, and marine sensors; all 11 development stages completed; educational research only; no real military data; production isolated.
+
 2. **NieboGuard Protocol Knowledge Base** (Protocol KB) — comprehensive, public documentation of technical standards, formats, and integration methods.
 
-### Sensor Hub
+### Current Status: ★ ALL 11 STAGES COMPLETE
 
-The Sensor Hub is an open-source alternative to the commercial NieboGuard production system, designed for community and research use.
-
-**Key features**
-
-- **Adapters for multiple sensor types**: ADS-B, Beast, Virtual Radar Server, Remote ID, MQTT, AIS, NMEA, weather formats, etc.
-- **Adapter architecture**: Each adapter follows a common interface for easy development and integration.
-- **REST API**: Public read-only endpoints for map data, statistics, and feed queries.
-- **WebSocket**: Live updates for panels, dashboards, and monitoring.
-- **SQLite WAL**: Local storage with ACID properties, faster than JSON.
-- **Cross-platform**: Windows, Linux, ARM64, Docker, Podman support.
-
-**Use cases**
-
-- **Developers** — build adapters and experiments.
-- **Researchers** — run custom data collection and analysis.
-- **Data scientists** — analyze raw sensor data.
-- **Panel developers** — build custom visualizations.
-- **IoT enthusiasts** — integrate custom hardware sensors.
-
-### Protocol Knowledge Base
-
-The Protocol Knowledge Base provides the definitive documentation for all sensor protocols, standards, and formats. It is a public, collaboratively maintained reference for:
-
-- **Standard specifications** — direct links to official documents, not reimplements.
-- **Implementation status** — which features work in Sensor Hub.
-- **Test procedures** — using Sensor Simulator & Protocol Lab.
-- **Wanted integrations** — contributions from the community.
-
-## Documentation
-
-### Sensor Hub
-
-See `docs/` for architecture, implementation details, and installation guides.
-
-### Protocol Knowledge Base
-
-The Protocol Knowledge Base is now a comprehensive documentation library:
-
-```
-docs/knowledge-base/
-├── README.md                # This page
-├── INDEX.md                 # Master index of all standards
-├── STANDARDS_MATRIX.md      # Implementation status per protocol
-├── SOURCES.md               # Verified source registry
-├── COMPATIBILITY.md         # Cross-protocol compatibility
-├── av/                      # Aviation standards (ADS-B, ASTERIX, FLARM)
-├── drones/                  # Drone / Remote ID
-├── maritime/                # AIS, NMEA
-├── weather/                 # ODIM HDF5, BUFR, GRIB2
-├── transport/               # HTTP/WS, TCP/UDP, MQTT
-├── hardware/                # SDR, Raspberry Pi, ESP32
-├── tutorials/               # How-to guides (ADS-B, CAT021, etc.)
-├── examples/                # Sample data
-└── WANTED.md                # Community proposals
-```
-
-All key standards are now documented. The initial implementation focus includes:
-
-- **ADS-B** — adapter stub + synthetic data
-- **ASTERIX CAT021/048/062** — encoders (MVP)
-- **HTTP JSON adapter** — SSRF-protected polling
-- **WebSocket adapter** — live updates
-- **Simulator module** — synthetic data generation and encoding
+| Stage | Feature | Tests |
+|-------|---------|-------|
+| 1 Audit | Production isolation, 15 findings documented | ✅ Complete |
+| 2 Unified Engine | WAL-based SQLite, shared engine | ✅ Complete |
+| 3 ADS-B | JSON parsing, dump1090 format | ✅ Complete |
+| 4 ASTERIX | CAT021/048/062 encoders | 12/12 tests pass |
+| 5 Virtual Radar | CAT048 physical geometry | ✅ Complete |
+| 6 Track Manager | CAT062 track management | ✅ Complete |
+| 7 Shared Sim Engine | synthetic/replay/modes, pooling | ✅ Complete |
+| 8 Military | Link 16/11/22 educational profiles | 6/6 tests pass |
+| 9 Protocol Lab UI | 7 tabs, PL/EN, WS routing | ✅ Complete |
+| 10 E2E Pipeline | ADS-B → AircraftEvent → CAT021/048/062 | ✅ Complete |
+| 11 Load Testing | 10-2000 objects, throughput 2.6M/s | ✅ Complete |
+| 12 Optimization | object pooling, xorshift RNG, rate limiting | ✅ Complete |
 
 ## Projects
 

@@ -6,7 +6,7 @@
 - wersja: `0.1.0-dev`
 - package: `pl.nieboguard.mobile`
 - rozmiar: ok. 53 MB
-- SHA-256: `e4857a79fbf9a640fbc06b1a50bedeabde194d08d021a480f6d461ffba9d33a6`
+- SHA-256: `aba794c16afb67bbab08421b3587374e1e16fb7ac5bdeff70b80b35588014c60`
 
 ```bash
 sha256sum -c releases/SHA256SUMS
