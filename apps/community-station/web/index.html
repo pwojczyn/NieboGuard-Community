@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NieboGuard Community Station</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .navbar {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .navbar nav a {
+            color: #4ecdc4;
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+        }
+        .navbar nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .stat-card {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1565c0;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .source-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .source-item:last-child {
+            border-bottom: none;
+        }
+        .source-name {
+            font-weight: 500;
+        }
+        .source-status {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        .status-active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: 0.4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+        input:checked + .slider { background-color: #2196f3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .map-placeholder {
+            background: #e3f2fd;
+            height: 300px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .language-selector {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .error-box {
+            background: #ffebee;
+            border-left: 4px solid #c62828;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #f57c00;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .lab-tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; border-bottom: 1px solid #ddd; }
+        .lab-tab { padding: 0.75rem 1rem; border: 1px solid #ccc; border-bottom: none; background: #f8f9fa; cursor: pointer; font-size: 0.9rem; }
+        .lab-tab:hover { background: #e9ecef; }
+        .lab-tab.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+        .lab-content { display: none; }
+        .lab-content.active { display: block; }
+        .sensor-card { border: 1px solid #ddd; border-radius: 8px; padding: 0.75rem; text-align: center; }
+        .btn-primary { padding: 0.5rem 1rem; background: #1a1a2e; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary:hover { background: #303f9f; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>NieboGuard Community Station</h1>
+        <nav>
+            <a href="#" data-lang="pl" class="language-pl">Panel</a>
+            <a href="#" data-lang="en" class="language-en">Panel</a>
+            <a href="#sources" data-lang="pl" class="language-pl">Źródła</a>
+            <a href="#sources" data-lang="en" class="language-en">Sources</a>
+            <a href="#map" data-lang="pl" class="language-pl">Mapa</a>
+            <a href="#map" data-lang="en" class="language-en">Map</a>
+            <a href="#history" data-lang="pl" class="language-pl">Historia</a>
+            <a href="#history" data-lang="en" class="language-en">History</a>
+            <a href="#settings" data-lang="pl" class="language-pl">Ustawienia</a>
+            <a href="#settings" data-lang="en" class="language-en">Settings</a>
+            <a href="#protocol-lab" data-lang="pl" class="language-pl">Protocol Lab</a>
+            <a href="#protocol-lab" data-lang="en" class="language-en">Protocol Lab</a>
+            <a href="#" id="lang-toggle">PL/EN</a>
+        </nav>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2 data-lang="pl" class="language-pl">Dashboard</h2>
+            <h2 data-lang="en" class="language-en">Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-sources">0</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Źródła aktywne</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Active Sources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-objects">0</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Obiekty</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Objects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-notices">0</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Komunikaty</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Notices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="status-mode">Lokalny</div>
+                    <div class="stat-label" data-lang="pl" class="language-pl">Tryb pracy</div>
+                    <div class="stat-label" data-lang="en" class="language-en">Operation Mode</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sources" class="card">
+            <h2 data-lang="pl" class="language-pl">Źródła danych</h2>
+            <h2 data-lang="en" class="language-en">Data Sources</h2>
+            <div id="sources-list"></div>
+        </div>
+
+        <div id="map" class="card">
+            <h2 data-lang="pl" class="language-pl">Mapa lokalna</h2>
+            <h2 data-lang="en" class="language-en">Local Map</h2>
+            <div class="map-placeholder">
+                <span data-lang="pl" class="language-pl">Mapa dostępna lokalnie (dane z sensorów)</span>
+                <span data-lang="en" class="language-en">Local map (sensor data)</span>
+            </div>
+        </div>
+
+        <div id="history" class="card">
+            <h2 data-lang="pl" class="language-pl">Historia obserwacji</h2>
+            <h2 data-lang="en" class="language-en">Observation History</h2>
+            <div id="history-list"></div>
+        </div>
+
+        <div id="settings" class="card">
+            <h2 data-lang="pl" class="language-pl">Ustawienia</h2>
+            <h2 data-lang="en" class="language-en">Settings</h2>
+            <p data-lang="pl" class="language-pl">Port nasłuchiwania: <strong id="config-port">8787</strong></p>
+            <p data-lang="en" class="language-en">Listen port: <strong id="config-port">8787</strong></p>
+            <p data-lang="pl" class="language-pl">Język interfejsu</p>
+            <p data-lang="en" class="language-en">Interface language</p>
+            <select class="language-selector" id="lang-select">
+                <option value="en" data-lang="pl" class="language-pl">Angielski</option>
+                <option value="en" data-lang="en" class="language-en">English</option>
+                <option value="pl" data-lang="pl" class="language-pl">Polski</option>
+                <option value="pl" data-lang="en" class="language-en">Polish</option>
+            </select>
+        </div>
+
+        <div id="protocol-lab" class="card">
+            <h2 data-lang="pl" class="language-pl">🔬 Laboratorium Protokółów</h2>
+            <h2 data-lang="en" class="language-en">🔬 Protocol Laboratory</h2>
+            <div class="lab-tabs" id="protocol-tabs">
+                <button class="lab-tab active" onclick="showLabTab('dashboard')">Dashboard</button>
+                <button class="lab-tab" onclick="showLabTab('adsb')">ADS-B</button>
+                <button class="lab-tab" onclick="showLabTab('asterix')">ASTERIX</button>
+                <button class="lab-tab" onclick="showLabTab('military')">Military</button>
+                <button class="lab-tab" onclick="showLabTab('multi')">Multi-Sensor</button>
+                <button class="lab-tab" onclick="showLabTab('results')">Results</button>
+                <button class="lab-tab" onclick="showLabTab('docs')">Docs</button>
+            </div>
+
+            <div id="lab-dashboard" class="lab-content active">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="lab-stat-total">0</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Wszystkie obiekty</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Total Objects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lab-stat-adsb">0</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">ADS-B</div>
+                        <div class="stat-label" data-lang="en" class="language-en">ADS-B</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lab-stat-asterix">0</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">ASTERIX</div>
+                        <div class="stat-label" data-lang="en" class="language-en">ASTERIX</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lab-stat-military">0</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Military</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Military</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="lab-adsb" class="lab-content">
+                <div class="map-placeholder" id="adsb-map">
+                    <span data-lang="pl" class="language-pl">Mapa ADS-B (dane na żywo)</span>
+                    <span data-lang="en" class="language-en">ADS-B Map (live data)</span>
+                </div>
+                <div id="adsb-sources" class="card">
+                    <h3 data-lang="pl" class="language-pl">Źródła ADS-B</h3>
+                    <h3 data-lang="en" class="language-en">ADS-B Sources</h3>
+                    <div id="adsb-sources-list"></div>
+                </div>
+            </div>
+
+            <div id="lab-asterix" class="lab-content">
+                <div class="map-placeholder" id="asterix-radar">
+                    <span data-lang="pl" class="language-pl">Radar ASTERIX (CAT048/CAT021/CAT062)</span>
+                    <span data-lang="en" class="language-en">ASTERIX Radar (CAT048/CAT021/CAT062)</span>
+                </div>
+                <div id="asterix-sources" class="card">
+                    <h3 data-lang="pl" class="language-pl">Źródła ASTERIX</h3>
+                    <h3 data-lang="en" class="language-en">ASTERIX Sources</h3>
+                    <div id="asterix-sources-list"></div>
+                </div>
+            </div>
+
+            <div id="lab-military" class="lab-content">
+                <div class="warning-box">
+                    <strong data-lang="pl" class="language-pl">Tylko edukacyjne:</strong>
+                    <strong data-lang="en" class="language-en">Educational only:</strong>
+                    <span data-lang="pl" class="language-pl">Symulacje Link 16/11/22 to profile edukacyjne, nie dane rzeczywiste.</span>
+                    <span data-lang="en" class="language-en">Link 16/11/22 simulations are educational profiles, not real data.</span>
+                </div>
+                <div id="military-tracks" class="card">
+                    <h3 data-lang="pl" class="language-pl">Torce wojskowe (symulowane)</h3>
+                    <h3 data-lang="en" class="language-en">Military Tracks (simulated)</h3>
+                    <table id="military-table" style="width:100%;border-collapse:collapse">
+                        <thead>
+                            <tr style="border-bottom:2px solid #ddd">
+                                <th style="padding:8px;text-align:left" data-lang="pl" class="language-pl">ID</th>
+                                <th style="padding:8px;text-align:left" data-lang="en" class="language-en">ID</th>
+                                <th style="padding:8px;color:#666" data-lang="pl" class="language-pl">Lot</th>
+                                <th style="padding:8px;color:#666" data-lang="en" class="language-en">Flight</th>
+                                <th style="padding:8px;color:#666" data-lang="pl" class="language-pl">Typ</th>
+                                <th style="padding:8px;color:#666" data-lang="pl" class="language-pl">Status</th>
+                                <th style="padding:8px;color:#666" data-lang="en" class="language-en">Status</th>
+                                <th style="padding:8px;color:#666" data-lang="pl" class="language-pl">Seen (s)</th>
+                                <th style="padding:8px;color:#666" data-lang="en" class="language-en">Seen (s)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="military-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="lab-multi" class="lab-content">
+                <div class="dashboard-grid" id="multi-sensor-grid">
+                    <div class="stat-card sensor-card" data-sensor="adsb">
+                        <div class="stat-value">ADS-B</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Automatyczna zależna</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Automatic Dependent</div>
+                        <div class="source-status status-inactive" id="multi-adsb-status">Inactive</div>
+                    </div>
+                    <div class="stat-card sensor-card" data-sensor="asterix">
+                        <div class="stat-value">ASTERIX</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Kategoria 048/021/062</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Category 048/021/062</div>
+                        <div class="source-status status-inactive" id="multi-asterix-status">Inactive</div>
+                    </div>
+                    <div class="stat-card sensor-card" data-sensor="military">
+                        <div class="stat-value">Military</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Link 16/11/22</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Link 16/11/22</div>
+                        <div class="source-status status-inactive" id="multi-military-status">Inactive</div>
+                    </div>
+                    <div class="stat-card sensor-card" data-sensor="fusion">
+                        <div class="stat-value">Fusion</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Fuzja wieloczujnikowa</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Multi-sensor Fusion</div>
+                        <div class="source-status status-inactive" id="multi-fusion-status">Inactive</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="lab-results" class="lab-content">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="results-uptime">0s</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Czas działania</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Uptime</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="results-msg-rate">0/s</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Wiadomości/s</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Messages/s</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="results-errors">0</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Błędy</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Errors</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="results-fusion">0</div>
+                        <div class="stat-label" data-lang="pl" class="language-pl">Połączone</div>
+                        <div class="stat-label" data-lang="en" class="language-en">Fused</div>
+                    </div>
+                </div>
+                <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap">
+                    <button class="btn-primary" onclick="exportResults('json')">
+                        <span data-lang="pl" class="language-pl">Eksport JSON</span>
+                        <span data-lang="en" class="language-en">Export JSON</span>
+                    </button>
+                    <button class="btn-primary" onclick="exportResults('csv')">
+                        <span data-lang="pl" class="language-pl">Eksport CSV</span>
+                        <span data-lang="en" class="language-en">Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="lab-docs" class="lab-content">
+                <div class="card">
+                    <h3 data-lang="pl" class="language-pl">Baza Wiedzy Protokołów</h3>
+                    <h3 data-lang="en" class="language-en">Protocol Knowledge Base</h3>
+                    <p data-lang="pl" class="language-pl">Dostęp do dokumentacji technicznej i specyfikacji.</p>
+                    <p data-lang="en" class="language-en">Access technical documentation and specifications.</p>
+                    <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem">
+                        <a href="/docs/protocol-lab/" target="_blank" style="color:#1565c0">
+                            📖 <span data-lang="pl" class="language-pl">Laboratorium Protokołów</span>
+                            <span data-lang="en" class="language-en">Protocol Laboratory</span>
+                        </a>
+                        <a href="/docs/knowledge-base/" target="_blank" style="color:#1565c0">
+                            📚 <span data-lang="pl" class="language-pl">Baza Wiedzy</span>
+                            <span data-lang="en" class="language-en">Knowledge Base</span>
+                        </a>
+                        <a href="/docs/simulator/" target="_blank" style="color:#1565c0">
+                            ⚙️ <span data-lang="pl" class="language-pl">Symulator</span>
+                            <span data-lang="en" class="language-en">Simulator</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Language toggle
+        document.getElementById('lang-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            const html = document.body;
+            const currentLang = html.getAttribute('data-lang');
+            const newLang = currentLang === 'en' ? 'pl' : 'en';
+            html.setAttribute('data-lang', newLang);
+        });
+
+        // Language selector
+        document.getElementById('lang-select').addEventListener('change', function() {
+            document.body.setAttribute('data-lang', this.value);
+        });
+
+        // Protocol Lab tab switching
+        function showLabTab(tabId) {
+            // Hide all content divs
+            document.querySelectorAll('.lab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lab-tab').forEach(el => el.classList.remove('active'));
+
+            // Show selected content
+            const content = document.getElementById('lab-' + tabId);
+            if (content) content.classList.add('active');
+
+            const tab = document.querySelector('.lab-tab[onclick="showLabTab(\'' + tabId + '\')']');
+            if (tab) tab.classList.add('active');
+        }
+
+        // Initialize: show dashboard tab by default
+        window.addEventListener('load', function() {
+            showLabTab('dashboard');
+            loadSources();
+            connectWebSocket();
+        });
+
+        // WebSocket connection
+        let wsConnection = null;
+        let wsReconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 10;
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const wsUrl = `${protocol}://${window.location.hostname}:8887/ws`;
+
+            wsConnection = new WebSocket(wsUrl);
+
+            wsConnection.onopen = () => {
+                console.log('WebSocket connected');
+                wsReconnectAttempts = 0;
+            };
+
+            wsConnection.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    // Route to protocol lab sections
+                    if (data.type && data.type.startsWith('lab-')) {
+                        handleLabMessage(data);
+                    } else {
+                        // Generic handling
+                        console.log('Unknown lab message type:', data.type);
+                    }
+                } catch (error) {
+                    console.error('WebSocket message parse error:', error);
+                }
+            };
+
+            wsConnection.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            wsConnection.onclose = (event) => {
+                console.log('WebSocket closed:', event.reason);
+                if (wsReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempts), 30000);
+                    setTimeout(connectWebSocket, delay);
+                    wsReconnectAttempts++;
+                } else {
+                    console.error('Max reconnect attempts reached');
+                }
+            };
+        }
+
+        function handleLabMessage(data) {
+            const type = data.type;
+            switch(type) {
+                case 'lab-adsb':
+                    renderAdsbDelta(data.data);
+                    break;
+                case 'lab-asterix':
+                    renderAsterixDelta(data.data);
+                    break;
+                case 'lab-military':
+                    renderMilitaryDelta(data.data);
+                    break;
+                case 'lab-results':
+                    updateResults(data.data);
+                    break;
+                default:
+                    console.log('Unsupported lab message type:', type);
+            }
+        }
+
+        function renderAdsbDelta(aircrafts) {
+            if (!aircrafts || !Array.isArray(aircrafts)) return;
+            const container = document.getElementById('adsb-sources-list');
+            container.innerHTML = aircrafts.map(ac => `
+                <div class="source-item">
+                    <div>
+                        <div class="source-name">${ac.hex || 'unknown'}</div>
+                        <div style="font-size:0.8rem;color:#666">Flight: ${ac.flight || '-'}</div>
+                    </div>
+                    <span class="source-status ${ac.simulated ? 'status-active' : 'status-inactive'}">
+                        ${ac.simulated ? 'symulowane' : 'aktywne'}
+                    </span>
+                </div>
+            `).join('');
+            document.getElementById('stat-objects').textContent = parseInt(document.getElementById('stat-objects').textContent) + aircrafts.length;
+        }
+
+        function renderAsterixDelta(records) {
+            const container = document.getElementById('asterix-sources-list');
+            if (!records || !Array.isArray(records)) {
+                container.innerHTML = '<p>No ASTERIX data</p>';
+                return;
+            }
+            container.innerHTML = records.map(rec => `
+                <div class="source-item">
+                    <div>
+                        <div class="source-name">CAT0${rec.cat || 21}</div>
+                        <div style="font-size:0.8rem;color:#666">ID: ${rec.id || '-'}</div>
+                    </div>
+                    <span class="source-status status-active">aktywne</span>
+                </div>
+            `).join('');
+        }
+
+        function renderMilitaryDelta(tracks) {
+            const tbody = document.getElementById('military-tbody');
+            if (!tracks || !Array.isArray(tracks)) {
+                tbody.innerHTML = '<tr><td colspan="10" style="padding:1rem">No military data</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tracks.map(t => `
+                <tr style="border-bottom:1px solid #eee">
+                    <td style="padding:8px;font-family:monospace">${t.id || '-'}</td>
+                    <td style="padding:8px;font-family:monospace">${t.sourceID || '-'}</td>
+                    <td style="padding:8px">${t.flight || '-'}</td>
+                    <td style="padding:8px;color:#666">${t.sourceType || '-'}</td>
+                    <td style="padding:8px">${t.category || '-'}</td>
+                    <td style="padding:8px">${t.track || '-'}</td>
+                    <td style="padding:8px">${Math.round(t.seen || 0)}</td>
+                    <td style="padding:8px">${Math.round(t.seen || 0) * 10 / 10}</td>
+                    <td style="padding:8px">${Math.round(t.seen || 0) * 10 / 10}</td>
+                    <td style="padding:8px">${Math.round(t.seen || 0) * 10 / 10}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateResults(data) {
+            if (!data) return;
+            document.getElementById('results-uptime').textContent = data.uptime || '0s';
+            document.getElementById('results-msg-rate').textContent = data.msgRate || '0/s';
+            document.getElementById('results-errors').textContent = data.errors || '0';
+            document.getElementById('results-fusion').textContent = data.fused || '0';
+        }
+
+        // Export functions
+        function exportResults(format) {
+            const data = {
+                uptime: document.getElementById('results-uptime').textContent,
+                msgRate: document.getElementById('results-msg-rate').textContent,
+                errors: document.getElementById('results-errors').textContent,
+                fused: document.getElementById('results-fusion').textContent,
+                timestamp: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: format === 'json' ? 'application/json' : 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nieboguard-results.${format}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Load sources
+        function loadSources() {
+            // This would be populated by the backend via API calls
+            document.getElementById('sources-list').innerHTML = `
+                <div class="source-item">
+                    <div>
+                        <div class="source-name">RTL-SDR USB</div>
+                        <div style="font-size:0.8rem;color:#666">Status: aktywne</div>
+                    </div>
+                    <span class="source-status status-active">aktywne</span>
+                </div>
+                <div class="source-item">
+                    <div>
+                        <div class="source-name">Simulator</div>
+                        <div style="font-size:0.8rem;color:#666">Status: aktywne</div>
+                    </div>
+                    <span class="source-status status-active">aktywne</span>
+                </div>
+            `;
+        }
+
+        // Connect WebSocket
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const wsUrl = `${protocol}://${window.location.hostname}:8887/ws`;
+
+            wsConnection = new WebSocket(wsUrl);
+
+            wsConnection.onopen = () => {
+                console.log('WebSocket connected');
+            };
+
+            wsConnection.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    // Route to protocol lab sections
+                    if (data.type && data.type.startsWith('lab-')) {
+                        handleLabMessage(data);
+                    } else {
+                        // Generic handling
+                        console.log('Unknown lab message type:', data.type);
+                    }
+                } catch (error) {
+                    console.error('WebSocket message parse error:', error);
+                }
+            };
+
+            wsConnection.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            wsConnection.onclose = (event) => {
+                console.log('WebSocket closed:', event.reason);
+                if (wsReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempts), 30000);
+                    setTimeout(connectWebSocket, delay);
+                    wsReconnectAttempts++;
+                } else {
+                    console.error('Max reconnect attempts reached');
+                }
+            };
+        }
+
+        // Initialize
+        loadSources();
+        setInterval(loadSources, 30000);
+        connectWebSocket(); // Start WebSocket connection
+    </script>
+</body>
+</html>
