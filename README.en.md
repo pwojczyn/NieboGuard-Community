@@ -39,17 +39,18 @@ node --test tests/*.test.mjs
 The JavaScript SDK has no production dependencies. The Python SDK uses only
 the standard library. The vision tool optionally requires Pillow.
 
-## Test APK
+## Android APK
 
-[`releases/`](releases/README.md) contains one NieboGuard test build:
+[`releases/`](releases/README.md) contains the public Android beta:
 
-- `nieboguard-dev-0.1.2-beta-debug.apk`,
-- debug-signed, not a release build; Android 0.1.2-beta-dev,
+- `nieboguard-0.1.2-beta-release.apk` — **user build**,
+  `pl.nieboguard.app`, signed with the upload key,
+- `nieboguard-dev-0.1.2-beta-debug.apk` — optional DEV build for testers,
 - SHA-256 in [`releases/SHA256SUMS`](releases/SHA256SUMS).
 
-It is the only APK in this repository. No `Straznik.apk` or other binaries are
-included. The APK contains no server secrets; see
-[`releases/APK-NOTICE.md`](releases/APK-NOTICE.md).
+This is an off-Play distribution until the Google Play release. FCM is present
+in the client, but the backend is disabled for testing. Wi-Fi NAN requires
+a Wi-Fi Aware phone. This is not an official warning system.
 
 ## Public API
 

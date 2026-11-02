@@ -26,7 +26,7 @@ class RepoHygieneTests(unittest.TestCase):
 
     def test_only_one_approved_apk(self):
         apks = [p for p in ROOT.rglob('*.apk') if '.git' not in p.parts]
-        self.assertEqual([str(p.relative_to(ROOT)) for p in apks], ['releases/nieboguard-dev-0.1.2-beta-debug.apk'])
+        self.assertEqual([str(p.relative_to(ROOT)) for p in apks], ['releases/nieboguard-0.1.2-beta-release.apk', 'releases/nieboguard-dev-0.1.2-beta-debug.apk'])
 
     def test_no_symlinks(self):
         links = [str(p.relative_to(ROOT)) for p in ROOT.rglob("*") if p.is_symlink()]

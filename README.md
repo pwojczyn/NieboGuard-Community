@@ -83,14 +83,15 @@
 
 Real-time systems, geospatial data, AI, aviation tracking. All synthetic data clearly marked (`simulated=true`). Educational profiles only.
 
-## Test APK
+## Android APK
 
-[`releases/`](releases/README.md) zawiera testowy build Android:
+[`releases/`](releases/README.md) zawiera publiczną wersję beta Androida:
 
-- `nieboguard-dev-0.1.2-beta-debug.apk`,
-- `pl.nieboguard.app.dev`, debug-signed, nie release,
+- `nieboguard-0.1.2-beta-release.apk` — **wersja dla użytkowników**,
+  `pl.nieboguard.app`, podpisana kluczem uploadu,
+- `nieboguard-dev-0.1.2-beta-debug.apk` — opcjonalna wersja DEV dla testerów,
 - SHA-256 w [`releases/SHA256SUMS`](releases/SHA256SUMS).
 
-FCM jest w kliencie, ale backend jest wyłączony do testów. Wi-Fi NAN wymaga
-telefonu z Wi-Fi Aware. To nie jest oficjalny system ostrzegania.
-
+To dystrybucja poza Google Play do czasu publikacji w sklepie. FCM jest
+w kliencie, ale backend jest wyłączony do testów. Wi-Fi NAN wymaga telefonu
+z Wi-Fi Aware. To nie jest oficjalny system ostrzegania.
