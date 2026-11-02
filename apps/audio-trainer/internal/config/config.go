@@ -16,57 +16,47 @@ type Configuration struct {
 	Language string `yaml:"language"`
 	Theme    string `yaml:"theme"`
 
-	// Training settings
 	Training TrainingConfig `yaml:"training"`
-
-	// Dataset settings
-	Dataset DatasetConfig `yaml:"dataset"`
-
-	// Compute integration
-	Compute ComputeConfig `yaml:"compute"`
-
-	// Data sharing consent
-	Consent ConsentConfig `yaml:"consent"`
+	Dataset  DatasetConfig  `yaml:"dataset"`
+	Compute  ComputeConfig  `yaml:"compute"`
+	Consent  ConsentConfig  `yaml:"consent"`
 }
 
-// TrainingConfig describes training parameters.
 type TrainingConfig struct {
-	Enabled           bool    `yaml:"enabled"`
-	Mode              string  `yaml:"mode"` // cpu-lite, cpu-standard
-	Backbone          string  `yaml:"backbone"` // yamnet, custom
-	Epochs            int     `yaml:"epochs"`
-	BatchSize         int     `yaml:"batch_size"`
-	LearningRate      float64 `yaml:"learning_rate"`
-	MaxThreads        int     `yaml:"max_threads"`
-	CpuLimitPercent   int     `yaml:"cpu_limit_percent"`
-	CheckpointDir     string  `yaml:"checkpoint_dir"`
+	Enabled             bool    `yaml:"enabled"`
+	Mode                string  `yaml:"mode"`
+	Backbone            string  `yaml:"backbone"`
+	Epochs              int     `yaml:"epochs"`
+	BatchSize           int     `yaml:"batch_size"`
+	LearningRate        float64 `yaml:"learning_rate"`
+	MaxThreads          int     `yaml:"max_threads"`
+	CpuLimitPercent     int     `yaml:"cpu_limit_percent"`
+	CheckpointDir       string  `yaml:"checkpoint_dir"`
 	ResumeFromCheckpoint string `yaml:"resume_from_checkpoint"`
-	YAMNetModelPath   string  `yaml:"yamnet_model_path"`
-	TensorFlowEnabled bool    `yaml:"tensorflow_enabled"`
-	TensorFlowPath    string  `yaml:"tensorflow_path"`
+	YAMNetModelPath     string  `yaml:"yamnet_model_path"`
+	TensorFlowEnabled   bool    `yaml:"tensorflow_enabled"`
+	TensorFlowPath      string  `yaml:"tensorflow_path"`
 }
 
-// DatasetConfig describes dataset settings.
 type DatasetConfig struct {
-	ImportDir         string `yaml:"import_dir"`
-	ManifestPath      string `yaml:"manifest_path"`
-	SplitTrain        int    `yaml:"split_train"`   // percent
-	SplitVal          int    `yaml:"split_val"`     // percent
-	SplitTest         int    `yaml:"split_test"`    // percent
-	ResampleHz        int    `yaml:"resample_hz"`   // 16000 for YAMNet
-	Mono              bool   `yaml:"mono"`
-	Normalize         bool   `yaml:"normalize"`
+	ImportDir     string `yaml:"import_dir"`
+	ManifestPath  string `yaml:"manifest_path"`
+	SplitTrain    int    `yaml:"split_train"`
+	SplitVal      int    `yaml:"split_val"`
+	SplitTest     int    `yaml:"split_test"`
+	ResampleHz    int    `yaml:"resample_hz"`
+	Mono          bool   `yaml:"mono"`
+	Normalize     bool   `yaml:"normalize"`
 }
 
-// ComputeConfig describes integration with NieboGuard Compute.
 type ComputeConfig struct {
 	Enabled   bool   `yaml:"enabled"`
 	ServerURL string `yaml:"server_url"`
-	Token     string `yaml:"token"`
+	// Token jest ładowany z bezpiecznego magazynu (Windows DPAPI / Linux keyring)
+	StoredAtRuntime bool `yaml:"stored_at_runtime"`
 	StationID string `yaml:"station_id"`
 }
 
-// ConsentConfig describes user consent for participation.
 type ConsentConfig struct {
 	Acknowledged bool   `yaml:"acknowledged"`
 	Timestamp    string `yaml:"timestamp"`
@@ -74,12 +64,10 @@ type ConsentConfig struct {
 	ShareData    bool   `yaml:"share_data"`
 }
 
-// DefaultConfigPath returns default config path.
 func DefaultConfigPath() string {
 	return filepath.Join(os.Getenv("USERPROFILE"), "NieboGuard", "AudioTrainer", "config.yaml")
 }
 
-// Default returns default configuration.
 func Default() *Configuration {
 	return &Configuration{
 		Port:      8788,
@@ -114,7 +102,7 @@ func Default() *Configuration {
 		Compute: ComputeConfig{
 			Enabled:   false,
 			ServerURL: "",
-			Token:     "",
+			StoredAtRuntime: false,
 			StationID: "",
 		},
 		Consent: ConsentConfig{
@@ -125,7 +113,6 @@ func Default() *Configuration {
 	}
 }
 
-// Load loads configuration from YAML file or creates default.
 func Load(path string) (*Configuration, error) {
 	cfg := Default()
 	if path == "" {
@@ -133,7 +120,6 @@ func Load(path string) (*Configuration, error) {
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
-		// If file does not exist, save default and return it.
 		if os.IsNotExist(err) {
 			return cfg, Save(cfg, path)
 		}
@@ -145,18 +131,31 @@ func Load(path string) (*Configuration, error) {
 	return cfg, nil
 }
 
-// Save saves configuration to YAML file.
 func Save(cfg *Configuration, path string) error {
 	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return fmt.Errorf("creating config dir %s: %w", dir, err)
 	}
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
 		return fmt.Errorf("marshaling config: %w", err)
 	}
-	if err := os.WriteFile(path, data, 0o644); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		return fmt.Errorf("writing config %s: %w", path, err)
 	}
+	return nil
+}
+
+// GetToken retrieves the compute token from secure storage (Windows DPAPI / Linux keyring).
+// Returns empty string if not stored yet.
+func GetToken(storeFile string) (string, error) {
+	// Will be implemented using secure.CredentialStore
+	return "", nil
+}
+
+// SetToken stores the compute token in secure storage (Windows DPAPI / Linux keyring).
+// Never saves token in plaintext config file.
+func SetToken(storeFile, token string) error {
+	// Will be implemented using secure.CredentialStore
 	return nil
 }

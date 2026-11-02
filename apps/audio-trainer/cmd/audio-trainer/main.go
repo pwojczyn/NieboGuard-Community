@@ -15,10 +15,11 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/config"
+	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/compute"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/dashboard"
-	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/training"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/dataset"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/model"
+	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/r2"
 )
 
 func main() {
@@ -69,37 +70,42 @@ func main() {
 		log.Fatalf("Failed to create workdir %s: %v", cfg.WorkDir, err)
 	}
 
-	// Create components
-	trainer, err := training.New(cfg)
+	// Create compute client (R2 integration)
+	computeClient, err := compute.NewClient(cfg.Compute.ServerURL, cfg.Compute.Token, cfg.Compute.StationID)
 	if err != nil {
-		log.Fatalf("Failed to create trainer: %v", err)
+		log.Fatalf("Failed to create compute client: %v", err)
 	}
 
-	datasetManager, err := dataset.New(cfg)
+	// Create dataset manager
+	datasetManager, err := dataset.New(cfg.Dataset)
 	if err != nil {
 		log.Fatalf("Failed to create dataset manager: %v", err)
 	}
 
-	modelManager, err := model.New(cfg)
+	// Create model manager
+	modelManager, err := model.New(cfg.Model)
 	if err != nil {
 		log.Fatalf("Failed to create model manager: %v", err)
 	}
 
-	api, err := dashboard.New(cfg)
+	// Create R2 download manager
+	r2DownloadMgr := r2.NewDownloadManager()
+
+	// Create dashboard
+	dashboard, err := dashboard.New(cfg, computeClient, datasetManager, modelManager, r2DownloadMgr)
 	if err != nil {
-		log.Fatalf("Failed to create dashboard API: %v", err)
+		log.Fatalf("Failed to create dashboard: %v", err)
 	}
 
 	// Start background processes
 	ctx, cancel := context.WithCancel(context.Background())
-	go trainer.Start(ctx)
-	go datasetManager.Start(ctx)
-	go modelManager.Start(ctx)
+	go dashboard.collectMetrics()
+	go dashboard.processTrainingEvents()
 
 	// Start API server
 	go func() {
 		r := mux.NewRouter()
-		api.RegisterRoutes(r)
+		dashboard.RegisterRoutes(r)
 		addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 		log.Printf("Starting Audio AI Trainer on %s", addr)
 		if err := http.ListenAndServe(addr, r); err != nil && err != http.ErrServerClosed {
