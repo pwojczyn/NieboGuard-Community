@@ -1,6 +1,6 @@
 ## NieboGuard
 
-**Autor:** Piotr Wojczyński (@pwojczyn)  
+**Autor:** [@pwojczyn](https://github.com/pwojczyn)  
 **Strona:** https://nieboguard.pl/  
 **Repo:** https://github.com/pwojczyn/NieboGuard-Community
 
