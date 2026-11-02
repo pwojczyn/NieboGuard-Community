@@ -61,20 +61,37 @@ install_binary() {
 
     log_info "Downloading NieboGuard Node for $ARCH..."
 
-    # Download binary
-    if command -v curl &>/dev/null; then
-        curl -L "$BINARY_URL" -o /usr/local/bin/nnode
-    elif command -v wget &>/dev/null; then
-        wget -O /usr/local/bin/nnode "$BINARY_URL"
-    else
-        log_error "Neither curl nor wget available"
+    local tmp_dir checksum_url expected actual
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "$tmp_dir"' EXIT
+    checksum_url="${BINARY_URL%/*}/SHA256SUMS"
+
+    download_file() {
+        if command -v curl &>/dev/null; then
+            curl -fL --retry 2 --connect-timeout 15 "$1" -o "$2"
+        elif command -v wget &>/dev/null; then
+            wget -O "$2" "$1"
+        else
+            log_error "Neither curl nor wget available"
+            exit 1
+        fi
+    }
+
+    download_file "$BINARY_URL" "$tmp_dir/nnode"
+    download_file "$checksum_url" "$tmp_dir/SHA256SUMS"
+    expected="$(awk -v name="$(basename "$BINARY_URL")" '$2 == name || $2 == "*" name { print $1 }' "$tmp_dir/SHA256SUMS" | head -n1)"
+    if [ -z "$expected" ]; then
+        log_error "SHA256SUMS does not contain $(basename "$BINARY_URL")"
+        exit 1
+    fi
+    actual="$(sha256sum "$tmp_dir/nnode" | awk '{ print $1 }')"
+    if [ "$expected" != "$actual" ]; then
+        log_error "Checksum mismatch for $(basename "$BINARY_URL")"
         exit 1
     fi
 
-    # Make executable
-    chmod +x /usr/local/bin/nnode
-
-    log_info "Binary installed to /usr/local/bin/nnode"
+    install -m 0755 "$tmp_dir/nnode" /usr/local/bin/nnode
+    log_info "Checksum verified; binary installed to /usr/local/bin/nnode"
 }
 
 # Install via Podman Quadlet
