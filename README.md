@@ -30,7 +30,7 @@
 | 📋 Roadmap | https://github.com/pwojczyn/NieboGuard-Community/blob/main/ROADMAP.md | ✅ |
 | 📘 Installation Guide | https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md | ✅ |
 
-**Social media (verified from site source 2026-11-02):**
+**Social media (official links):**
 
 | Platforma | Link | Status |
 |-----------|------|--------|
@@ -44,16 +44,18 @@
 | 📋 Roadmap | https://github.com/pwojczyn/NieboGuard-Community/blob/main/ROADMAP.md | ✅ |
 | 📘 Installation Guide | https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md | ✅ |
 | 🌐 Telegram | https://t.me/NieboGuard | ✅ Zweryfikowane |
+| ✈️ Telegram Bot | https://t.me/NieboGuardBot | ✅ Zweryfikowane |
+| 👥 Telegram Grupa | https://t.me/nieboguardcommunity | ✅ Zweryfikowane |
 | 📘 Facebook | https://www.facebook.com/nieboguard | ✅ Zweryfikowane |
 | 📸 Instagram | https://www.instagram.com/nieboguard/ | ✅ Zweryfikowane |
 
-> **Uwaga:** Kanały YouTube, X/Twitter i TikTok nie zostały znalezione na stronie oficjalnej. Sprawdź ręcznie, czy istnieją profile oficjalne NieboGuard na tych platformach.
+> **Uwaga:** Bot `@NieboGuardBot` i grupa `@nieboguardcommunity` zostały potwierdzone przez maintainera 2026-11-03. Kanały YouTube, X/Twitter i TikTok nie zostały znalezione na stronie oficjalnej — sprawdź ręcznie, czy istnieją profile oficjalne NieboGuard na tych platformach.
 
 ---
 
 ## 11.5. Follow NieboGuard
 
-### Official verified links (2026-11-02)
+### Official links
 
 | Platform | Link | Status |
 |----------|------|--------|
@@ -66,6 +68,9 @@
 | 📜 CHANGELOG | https://github.com/pwojczyn/NieboGuard-Community/blob/main/CHANGELOG.md | ✅ |
 | 📋 Roadmap | https://github.com/pwojczyn/NieboGuard-Community/blob/main/ROADMAP.md | ✅ |
 | 📘 Installation Guide | https://github.com/pwojczyn/NieboGuard-Community/blob/main/INSTALL.md | ✅ |
+| ✈️ Telegram Channel | https://t.me/NieboGuard | ✅ Verified |
+| 🤖 Telegram Bot | https://t.me/NieboGuardBot | ✅ Verified |
+| 👥 Telegram Group | https://t.me/nieboguardcommunity | ✅ Verified |
 
 ---
 
