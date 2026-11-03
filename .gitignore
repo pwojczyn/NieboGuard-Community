@@ -13,8 +13,12 @@
 node_modules/
 __pycache__/
 .venv/
-dist/
-build/
+!dist/*.exe
+!dist/*.tar.gz
+!dist/*.sha256
+!dist/*.json
+!dist/manifest*.json
+!deploy/
 .coverage
 .pytest_cache/
 .DS_Store
