@@ -43,9 +43,9 @@ the standard library. The vision tool optionally requires Pillow.
 
 [`releases/`](releases/README.md) contains the public Android beta:
 
-- `nieboguard-0.1.2-beta-release.apk` — **user build**,
+- `nieboguard-0.1.3-beta-release.apk` — **user build**,
   `pl.nieboguard.app`, signed with the upload key,
-- `nieboguard-dev-0.1.2-beta-debug.apk` — optional DEV build for testers,
+- `nieboguard-dev-0.1.3-beta-debug.apk` — optional DEV build for testers,
 - SHA-256 in [`releases/SHA256SUMS`](releases/SHA256SUMS).
 
 This is an off-Play distribution until the Google Play release. FCM is present

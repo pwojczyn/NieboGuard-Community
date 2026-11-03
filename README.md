@@ -92,9 +92,9 @@ Real-time systems, geospatial data, AI, aviation tracking. All synthetic data cl
 
 [`releases/`](releases/README.md) zawiera publiczną wersję beta Androida:
 
-- `nieboguard-0.1.2-beta-release.apk` — **wersja dla użytkowników**,
+- `nieboguard-0.1.3-beta-release.apk` — **wersja dla użytkowników**,
   `pl.nieboguard.app`, podpisana kluczem uploadu,
-- `nieboguard-dev-0.1.2-beta-debug.apk` — opcjonalna wersja DEV dla testerów,
+- `nieboguard-dev-0.1.3-beta-debug.apk` — opcjonalna wersja DEV dla testerów,
 - SHA-256 w [`releases/SHA256SUMS`](releases/SHA256SUMS).
 
 To dystrybucja poza Google Play do czasu publikacji w sklepie. FCM jest

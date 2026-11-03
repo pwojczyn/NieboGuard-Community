@@ -1,6 +1,6 @@
 # APK distribution notice
 
-`nieboguard-0.1.2-beta-release.apk` to publiczna wersja beta Androida
+`nieboguard-0.1.3-beta-release.apk` to publiczna wersja beta Androida
 `pl.nieboguard.app`, dystrybuowana poza Google Play do czasu publikacji
 w sklepie.
 
@@ -13,7 +13,7 @@ w sklepie.
   [`../THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) oraz w zasobach APK.
 - Dystrybucja APK nie oznacza licencji MIT na produkcyjny kod NieboGuard.
 
-`nieboguard-dev-0.1.2-beta-debug.apk` jest opcjonalnym buildem dla testerów
+`nieboguard-dev-0.1.3-beta-debug.apk` jest opcjonalnym buildem dla testerów
 (`pl.nieboguard.app.dev`, debug).
 
 Przed instalacją sprawdź SHA-256 z `SHA256SUMS`.
