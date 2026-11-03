@@ -1,0 +1,52 @@
+# NieboGuard Audio AI Trainer — Production Deployment Config
+# Version: 1.0.0
+# Date: 2026-11-03
+# Platform: Windows 10/11 x64 (CPU-only)
+
+deploy:
+  name: "NieboGuard-Audio-Trainer"
+  version: "1.0.0"
+  build_version: "1.0.0"
+  platform: "windows-x64"
+  arch: "amd64"
+  build_command: "CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc go build -o build/NieboGuard-Audio-Trainer.exe ./cmd/audio-trainer/"
+  binary_size_target: "9.8MB"
+  build_time: "2026-11-03 07:23"
+
+distribution:
+  r2_bucket: "nieboguard-community"
+  r2_prefix: "deploy/windows/"
+  package_name: "NieboGuard-Audio-Trainer-Setup.exe"
+  checksum_file: "NieboGuard-Audio-Trainer-Setup.exe.sha256"
+  manifest_path: "deploy/windows/manifest.json"
+
+security:
+  # No plaintext secrets in package
+  token_storage: "Windows DPAPI / Linux keyring"
+  credential_file: "%LOCALAPPDATA%\\NieboGuard\\AudioTrainer\\credentials.store"
+  config_path: "%LOCALAPPDATA%\\NieboGuard\\AudioTrainer\\config.yaml"
+  # Ed25519 public key embedded in binary
+  public_key_path: "internal/crypto/ed25519.go"
+  # Agent hardening enabled
+  agent_hardening: true
+  csrf_protection: true
+  dns_rebinding_protection: true
+
+installation:
+  default_dir: "%PROGRAMFILES%\\NieboGuard\\AudioAI"
+  install_size: "~15MB"
+  prerequisites: "Windows 10/11 x64, 8GB RAM, 500MB disk"
+  installer_type: "NSIS (Windows)"
+  shortcut: "Desktop + Start Menu"
+
+post_install:
+  - Create workdir at %LOCALAPPDATA%\NieboGuard\AudioTrainer
+  - Initialize secure credential store
+  - Open dashboard at http://127.0.0.1:8788/
+  - Recommend first-time config wizard
+
+updates:
+  channel: "stable"
+  auto_update: false  # User must approve updates
+  update_check_interval: "7d"
+  manifest_url: "https://r2.cloudflarestorage.com/nieboguard-community/deploy/windows/manifest.json"

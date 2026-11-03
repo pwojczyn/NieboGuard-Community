@@ -1,0 +1,42 @@
+# NieboGuard Audio AI Trainer — Linux Deployment
+# Version 1.0.0
+# Binary: build/audio-trainer (Linux x64)
+
+deploy:
+  name: "NieboGuard-Audio-Trainer-Linux"
+  version: "1.0.0"
+  platform: "linux-x64"
+  arch: "amd64"
+  binary: "build/audio-trainer"
+  build_command: "CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o build/audio-trainer ./cmd/audio-trainer/"
+
+distribution:
+  r2_bucket: "nieboguard-community"
+  r2_prefix: "deploy/linux/"
+  package_name: "NieboGuard-Audio-Trainer-Linux.tar.gz"
+  checksum_file: "NieboGuard-Audio-Trainer-Linux.tar.gz.sha256"
+  manifest_path: "deploy/linux/manifest.json"
+
+security:
+  credential_storage: "Linux keyring / encrypted file"
+  default_workdir: "$HOME/.local/share/NieboGuard/AudioTrainer"
+  config_path: "$HOME/.local/share/NieboGuard/AudioTrainer/config.yaml"
+  credential_file: "$HOME/.local/share/NieboGuard/AudioTrainer/credentials.store"
+
+installation:
+  default_dir: "$HOME/.local/share/NieboGuard/AudioTrainer"
+  install_size: "~10MB"
+  prerequisites: "Linux x64, glibc 2.31+, 8GB RAM, 500MB disk"
+  binary: "build/audio-trainer"
+
+post_install:
+  - Create workdir at ~/.local/share/NieboGuard/AudioTrainer
+  - Initialize secure credential store
+  - Open browser to http://127.0.0.1:8788/
+  - Run first-time config wizard
+
+updates:
+  channel: "stable"
+  auto_update: false
+  update_check_interval: "7d"
+  manifest_url: "https://r2.cloudflarestorage.com/nieboguard-community/deploy/linux/manifest.json"
