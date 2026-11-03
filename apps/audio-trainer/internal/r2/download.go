@@ -3,6 +3,7 @@ package r2
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -12,14 +13,18 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	crypto "github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/crypto"
 )
 
+// DownloadManager struct remains unchanged
 type DownloadManager struct {
 	logger    *slog.Logger
 	downloads map[string]*DownloadStatus
 	mu        sync.RWMutex
 }
 
+// DownloadStatus struct remains unchanged
 type DownloadStatus struct {
 	ObjectPath   string    `json:"object_path"`
 	URL          string    `json:"url"`
@@ -39,7 +44,47 @@ func NewDownloadManager() *DownloadManager {
 	}
 }
 
+// DownloadObject downloads an object with manifest verification
 func (dm *DownloadManager) DownloadObject(objectPath, url, expectedHash string, sizeBytes int64, destPath string) error {
+	// 1. Verify manifest signature and file hashes before downloading
+	manifestPath := filepath.Join(objectPath, "manifest.json")
+
+	// Check if manifest exists and verify it
+	manifestData, err := os.ReadFile(manifestPath)
+	if err != nil {
+		dm.updateStatus(objectPath, "failed", fmt.Sprintf("manifest not found: %v", err))
+		return fmt.Errorf("manifest not found: %w", err)
+	}
+
+	var manifest crypto.Manifest
+	if err := json.Unmarshal(manifestData, &manifest); err != nil {
+		dm.updateStatus(objectPath, "failed", fmt.Sprintf("manifest JSON parse error: %v", err))
+		return fmt.Errorf("manifest JSON parse error: %w", err)
+	}
+
+	// Verify manifest signature
+	if err := crypto.VerifyManifest(&manifest); err != nil {
+		dm.updateStatus(objectPath, "failed", fmt.Sprintf("manifest verification failed: %v", err))
+		return fmt.Errorf("manifest verification failed: %w", err)
+	}
+
+	// Verify all files have matching hashes
+	for _, file := range manifest.Files {
+		filePath := filepath.Join(objectPath, file.Path)
+		fileData, err := os.ReadFile(filePath)
+		if err != nil {
+			dm.updateStatus(objectPath, "failed", fmt.Sprintf("file not found: %s", filePath))
+			return fmt.Errorf("file not found: %w", err)
+		}
+
+		computedHash := fmt.Sprintf("%x", sha256.Sum256(fileData))
+		if computedHash != file.SHA256 {
+			dm.updateStatus(objectPath, "failed", fmt.Sprintf("file %s hash mismatch", file.Path))
+			return fmt.Errorf("file %s hash mismatch", file.Path)
+		}
+	}
+
+	// 2. Proceed with download (rest of the function unchanged)
 	dm.mu.Lock()
 	dm.downloads[objectPath] = &DownloadStatus{
 		ObjectPath: objectPath,
@@ -88,10 +133,8 @@ func (dm *DownloadManager) DownloadObject(objectPath, url, expectedHash string, 
 	// Download with SHA-256 verification
 	hasher := sha256.New()
 	multiWriter := io.MultiWriter(outFile, hasher)
-	
 
 	reader := &progressReader{reader: resp.Body, onProgress: func(n int64) {
-	
 		dm.mu.Lock()
 		if ds, ok := dm.downloads[objectPath]; ok {
 			ds.Downloaded = n
@@ -122,6 +165,7 @@ func (dm *DownloadManager) DownloadObject(objectPath, url, expectedHash string, 
 		return err
 	}
 
+	// Update status
 	dm.mu.Lock()
 	if ds, ok := dm.downloads[objectPath]; ok {
 		ds.Status = "verified"
@@ -171,4 +215,11 @@ func (pr *progressReader) Read(p []byte) (int, error) {
 		pr.onProgress(pr.total)
 	}
 	return n, err
+}
+
+func (dm *DownloadManager) GenerateSignedURL(objectPath string, expires time.Duration) (string, error) {
+	hash := sha256.New()
+	hash.Write([]byte(objectPath + expires.String()))
+	signature := hex.EncodeToString(hash.Sum(nil)[:32])
+	return fmt.Sprintf("https://signed-r2/%s?sig=%s&exp=%d", objectPath, signature, time.Now().Add(expires).Unix()), nil
 }
