@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/config"
+	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/agent"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/compute"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/dashboard"
 	"github.com/pwojczyn/NieboGuard-Community/apps/audio-trainer/internal/dataset"
@@ -78,6 +79,12 @@ func main() {
 		log.Fatalf("Failed to create compute client: %v", err)
 	}
 
+	// Create hardened agent for compute API (CSRF/DNS rebinding protection)
+	agent, err := agent.NewAgent(cfg.Compute.ServerURL, cfg.Compute.StationID, "compute_token_key", credStore)
+	if err != nil {
+		log.Fatalf("Failed to create agent: %v", err)
+	}
+
 	// Create dataset manager
 	datasetManager, err := dataset.New(cfg)
 	if err != nil {
@@ -122,6 +129,7 @@ func main() {
 	<-sigChan
 	log.Println("Shutting down...")
 	cancel()
+	agent.Close()
 
 	// Graceful shutdown with timeout
 	timer := time.NewTimer(30 * time.Second)
