@@ -13,14 +13,17 @@
   "social_media_verified": {
     "telegram": "https://t.me/NieboGuard",
     "facebook": "https://www.facebook.com/nieboguard",
-    "instagram": "https://www.instagram.com/nieboguard/"
+    "instagram": "https://www.instagram.com/nieboguard/",
+    "telegram_bot": "https://t.me/NieboGuardBot",
+    "telegram_group": "https://t.me/nieboguardcommunity"
   },
   "social_media_unverified": {
     "youtube": "NOT_VERIFIED",
-    "x_twitter": "NOT_VERIFIED", 
+    "x_twitter": "NOT_VERIFIED",
     "tiktok": "NOT_VERIFIED"
   },
   "verified_date": "2026-11-02",
   "source": "Direct verification from https://nieboguard.pl/ HTML source (extracted via grep on page content)",
-  "note": "Telegram (t.me/NieboGuard), Facebook (facebook.com/nieboguard), Instagram (instagram.com/nieboguard/) are verified from website source. YouTube, X/Twitter, TikTok were NOT FOUND on site - unverified status maintained."
+  "note": "Telegram channel, Facebook and Instagram verified from website source. Telegram bot (@NieboGuardBot) and group (@nieboguardcommunity) confirmed by the maintainer on 2026-11-03. YouTube, X/Twitter and TikTok remain NOT_VERIFIED.",
+  "maintainer_confirmed": "2026-11-03"
 }

@@ -14,9 +14,12 @@
     "instagram": "https://www.instagram.com/nieboguard/",
     "youtube": "NOT_VERIFIED",
     "x_twitter": "NOT_VERIFIED",
-    "tiktok": "NOT_VERIFIED"
+    "tiktok": "NOT_VERIFIED",
+    "telegram_bot": "https://t.me/NieboGuardBot",
+    "telegram_group": "https://t.me/nieboguardcommunity"
   },
   "verified_date": "2026-11-02",
   "source": "HTML source of https://nieboguard.pl/ (verified via curl grep)",
-  "note": "Telegram, Facebook, Instagram verified from page source. YouTube, X/Twitter, TikTok not found on site - must verify manually if they exist."
+  "note": "Telegram channel verified from website source; bot and group confirmed by the maintainer on 2026-11-03. Facebook and Instagram are listed from the website source. YouTube, X/Twitter and TikTok remain NOT_VERIFIED.",
+  "maintainer_confirmed": "2026-11-03"
 }
