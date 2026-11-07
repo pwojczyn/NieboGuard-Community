@@ -11,7 +11,7 @@ import (
 func TestLoadConcurrency(t *testing.T) {
 	for _, count := range []int{10, 100, 500, 1000} {
 		engine := sim.NewEngine(sim.ModeSynthetic)
-		engine.SyntheticCount = count
+		engine.SetCount(count)
 
 		obs, err := engine.NextFrame()
 		if err != nil {
@@ -35,7 +35,7 @@ func TestLoadConcurrency(t *testing.T) {
 // TestLoadThroughput measures how many observations per second the engine can produce
 func TestLoadThroughput(t *testing.T) {
 	engine := sim.NewEngine(sim.ModeSynthetic)
-	engine.SyntheticCount = 1000
+	engine.SetCount(1000)
 
 	obs, err := engine.NextFrame()
 	if err != nil {
@@ -60,7 +60,7 @@ func TestLoadThroughput(t *testing.T) {
 // TestLoadStability verifies the engine remains stable under sustained load
 func TestLoadStability(t *testing.T) {
 	engine := sim.NewEngine(sim.ModeSynthetic)
-	engine.SyntheticCount = 2000
+	engine.SetCount(2000)
 
 	obs, err := engine.NextFrame()
 	if err != nil {
