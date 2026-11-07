@@ -88,6 +88,20 @@ func (s *Storage) Initialize() error {
 			key TEXT PRIMARY KEY,
 			value BLOB
 		);`,
+		`CREATE TABLE IF NOT EXISTS offline_packs (
+			id TEXT NOT NULL,
+			version TEXT NOT NULL,
+			sha256 TEXT NOT NULL,
+			bytes INTEGER NOT NULL DEFAULT 0,
+			created_at TEXT NOT NULL,
+			manifest_json TEXT NOT NULL,
+			mode TEXT NOT NULL DEFAULT 'UNVERIFIED',
+			sharing TEXT NOT NULL DEFAULT 'LOCAL_ONLY',
+			status TEXT NOT NULL DEFAULT 'AVAILABLE',
+			updated_at TEXT NOT NULL,
+			PRIMARY KEY (id, version)
+		);`,
+		`CREATE INDEX IF NOT EXISTS idx_offline_packs_created ON offline_packs(created_at DESC);`,
 
 		`CREATE INDEX IF NOT EXISTS idx_notices_time ON notices(published_at);`,
 	}
@@ -160,18 +174,92 @@ func (s *Storage) GetAircraft(limit int, offset int) ([]AircraftEvent, error) {
 
 // AircraftEvent represents an aircraft observation.
 type AircraftEvent struct {
-	ID        string     `json:"id"`
-	Hex       string     `json:"hex"`
-	Flight    string     `json:"flight"`
-	Lat       float64    `json:"lat"`
-	Lon       float64    `json:"lon"`
-	AltBaro   int        `json:"alt_baro"`
-	GS        float64    `json:"gs"`
-	Track     float64    `json:"track"`
-	Seen      float64    `json:"seen"`
-	SourceID  string     `json:"source_id"`
+	ID         string    `json:"id"`
+	Hex        string    `json:"hex"`
+	Flight     string    `json:"flight"`
+	Lat        float64   `json:"lat"`
+	Lon        float64   `json:"lon"`
+	AltBaro    int       `json:"alt_baro"`
+	GS         float64   `json:"gs"`
+	Track      float64   `json:"track"`
+	Seen       float64   `json:"seen"`
+	SourceID   string    `json:"source_id"`
 	SourceType string    `json:"source_type"`
 	ObservedAt time.Time `json:"observed_at"`
-	Verified  int        `json:"verified"`
-	Synthetic int        `json:"synthetic"`
+	Verified   int       `json:"verified"`
+	Synthetic  int       `json:"synthetic"`
+}
+
+// OfflinePack is a verified offline data pack manifest record.
+type OfflinePack struct {
+	ID           string `json:"id"`
+	Version      string `json:"version"`
+	Sha256       string `json:"sha256"`
+	Bytes        int64  `json:"bytes"`
+	CreatedAt    string `json:"created_at"`
+	ManifestJSON string `json:"-"`
+	Mode         string `json:"mode"`
+	Sharing      string `json:"sharing"`
+	Status       string `json:"status"`
+	UpdatedAt    string `json:"updated_at"`
+}
+
+// UpsertOfflinePack stores a manifest without accepting arbitrary file paths.
+func (s *Storage) UpsertOfflinePack(p *OfflinePack) error {
+	if p == nil || p.ID == "" || p.Version == "" || p.Sha256 == "" {
+		return fmt.Errorf("invalid offline pack")
+	}
+	_, err := s.db.Exec(`INSERT INTO offline_packs (id,version,sha256,bytes,created_at,manifest_json,mode,sharing,status,updated_at)
+		VALUES (?,?,?,?,?,?,?,?,?,?)
+		ON CONFLICT(id,version) DO UPDATE SET sha256=excluded.sha256,bytes=excluded.bytes,
+		manifest_json=excluded.manifest_json,mode=excluded.mode,sharing=excluded.sharing,
+		status=excluded.status,updated_at=excluded.updated_at`,
+		p.ID, p.Version, p.Sha256, p.Bytes, p.CreatedAt, p.ManifestJSON, p.Mode, p.Sharing, p.Status, p.UpdatedAt)
+	return err
+}
+
+// ListOfflinePacks returns newest manifests, optionally filtered by pack id.
+func (s *Storage) ListOfflinePacks(id string, limit int) ([]OfflinePack, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+	var rows *sql.Rows
+	var err error
+	if id != "" {
+		rows, err = s.db.Query(`SELECT id,version,sha256,bytes,created_at,manifest_json,mode,sharing,status,updated_at FROM offline_packs WHERE id=? ORDER BY created_at DESC LIMIT ?`, id, limit)
+	} else {
+		rows, err = s.db.Query(`SELECT id,version,sha256,bytes,created_at,manifest_json,mode,sharing,status,updated_at FROM offline_packs ORDER BY created_at DESC LIMIT ?`, limit)
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []OfflinePack
+	for rows.Next() {
+		var p OfflinePack
+		if err := rows.Scan(&p.ID, &p.Version, &p.Sha256, &p.Bytes, &p.CreatedAt, &p.ManifestJSON, &p.Mode, &p.Sharing, &p.Status, &p.UpdatedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
+// CurrentOfflinePack returns the newest version of a pack.
+func (s *Storage) CurrentOfflinePack(id string) (*OfflinePack, error) {
+	packs, err := s.ListOfflinePacks(id, 1)
+	if err != nil || len(packs) == 0 {
+		return nil, err
+	}
+	return &packs[0], nil
+}
+
+// PruneOfflinePacks removes old manifest rows (not files).
+func (s *Storage) PruneOfflinePacks(before time.Time) (int64, error) {
+	r, err := s.db.Exec(`DELETE FROM offline_packs WHERE created_at < ?`, before.UTC().Format(time.RFC3339))
+	if err != nil {
+		return 0, err
+	}
+	n, _ := r.RowsAffected()
+	return n, nil
 }

@@ -7,7 +7,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -237,6 +239,109 @@ func (s *Server) AdminSourcesHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+var sha256Pattern = regexp.MustCompile(`^[a-f0-9]{64}$`)
+
+// OfflinePacksHandler returns verified offline manifest metadata.
+func (s *Server) OfflinePacksHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		handleError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	id := strings.TrimSpace(r.URL.Query().Get("id"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	packs, err := s.storage.ListOfflinePacks(id, limit)
+	if err != nil {
+		s.logger.Error("listing offline packs", "error", err)
+		handleError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{"packs": packs, "total": len(packs)})
+}
+
+// CurrentOfflinePackHandler returns the newest version of one pack.
+func (s *Server) CurrentOfflinePackHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		handleError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	id := strings.TrimSpace(mux.Vars(r)["id"])
+	if id == "" {
+		handleError(w, http.StatusBadRequest, "pack id required")
+		return
+	}
+	pack, err := s.storage.CurrentOfflinePack(id)
+	if err != nil {
+		s.logger.Error("reading offline pack", "error", err)
+		handleError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	if pack == nil {
+		handleError(w, http.StatusNotFound, "pack not found")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(pack)
+}
+
+// AdminOfflinePackHandler registers manifest metadata. It never accepts a file path.
+func (s *Server) AdminOfflinePackHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		handleError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	var body struct {
+		ID           string `json:"id"`
+		Version      string `json:"version"`
+		Sha256       string `json:"sha256"`
+		Bytes        int64  `json:"bytes"`
+		CreatedAt    string `json:"created_at"`
+		Mode         string `json:"mode"`
+		Sharing      string `json:"sharing"`
+		Status       string `json:"status"`
+		ManifestJSON string `json:"manifest_json"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 64*1024)).Decode(&body); err != nil {
+		handleError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	body.ID = strings.TrimSpace(body.ID)
+	body.Version = strings.TrimSpace(body.Version)
+	body.Sha256 = strings.ToLower(strings.TrimSpace(body.Sha256))
+	if body.ID == "" || body.Version == "" || !sha256Pattern.MatchString(body.Sha256) || body.Bytes < 0 {
+		handleError(w, http.StatusBadRequest, "invalid manifest fields")
+		return
+	}
+	if body.Mode == "" {
+		body.Mode = "UNVERIFIED"
+	}
+	if body.Sharing == "" {
+		body.Sharing = "LOCAL_ONLY"
+	}
+	if body.Mode == "SIMULATED" && body.Sharing != "LOCAL_ONLY" {
+		handleError(w, http.StatusBadRequest, "simulated pack must be LOCAL_ONLY")
+		return
+	}
+	if body.Status == "" {
+		body.Status = "AVAILABLE"
+	}
+	if body.CreatedAt == "" {
+		body.CreatedAt = time.Now().UTC().Format(time.RFC3339)
+	}
+	if body.ManifestJSON == "" {
+		body.ManifestJSON = "{}"
+	}
+	pack := &storage.OfflinePack{ID: body.ID, Version: body.Version, Sha256: body.Sha256, Bytes: body.Bytes, CreatedAt: body.CreatedAt, ManifestJSON: body.ManifestJSON, Mode: body.Mode, Sharing: body.Sharing, Status: body.Status, UpdatedAt: time.Now().UTC().Format(time.RFC3339)}
+	if err := s.storage.UpsertOfflinePack(pack); err != nil {
+		s.logger.Error("upserting offline pack", "error", err)
+		handleError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "pack": pack})
+}
+
 // setupRoutes configures the HTTP routes.
 func (s *Server) setupRoutes(router *mux.Router) {
 	router.HandleFunc("/api/v1/health", s.HealthHandler).Methods(http.MethodGet)
@@ -253,6 +358,9 @@ func (s *Server) setupRoutes(router *mux.Router) {
 	router.HandleFunc("/api/v1/events", s.EventsHandler).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/notices", s.NoticesHandler).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/stats", s.StatsHandler).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/offline/packs", s.OfflinePacksHandler).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/offline/packs/{id}", s.CurrentOfflinePackHandler).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/admin/offline/packs", s.AdminOfflinePackHandler).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/admin/sources", s.AdminSourcesHandler).Methods(http.MethodPost)
 }
 

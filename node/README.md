@@ -43,3 +43,16 @@ Testy:
 ```bash
 go test ./...
 ```
+
+## Offline packs
+
+Metadane paczek offline są przechowywane w SQLite:
+
+```text
+GET  /api/v1/offline/packs?id=pack-id
+GET  /api/v1/offline/packs/{id}
+POST /api/v1/admin/offline/packs
+```
+
+Admin wymaga `NNODE_AUTH_TOKEN`. API przyjmuje wyłącznie manifest i SHA-256;
+nie przyjmuje ścieżki plików. Symulowana paczka musi mieć `LOCAL_ONLY`.
