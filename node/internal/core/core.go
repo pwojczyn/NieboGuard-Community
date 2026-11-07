@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/pwojczyn/NieboGuard-Community/node/internal/api"
 	"github.com/pwojczyn/NieboGuard-Community/node/internal/collectors"
@@ -25,15 +26,15 @@ type Options struct {
 
 // Core represents the NieboGuard Node engine.
 type Core struct {
-	opts        Options
-	config      *config.Configuration
-	logger      *slog.Logger
-	storage     *storage.Storage
-	collector   *collectors.Manager
-	apiServer   *api.Server
-	wssServer   *websocket.Server
-	shutdown    chan struct{}
-	stopped     chan struct{}
+	opts      Options
+	config    *config.Configuration
+	logger    *slog.Logger
+	storage   *storage.Storage
+	collector *collectors.Manager
+	apiServer *api.Server
+	wssServer *websocket.Server
+	shutdown  chan struct{}
+	stopped   chan struct{}
 }
 
 // New creates a new Core engine instance.
@@ -48,6 +49,23 @@ func New(opts Options) (*Core, error) {
 		return nil, fmt.Errorf("loading config: %w", err)
 	}
 
+	if opts.Port > 0 {
+		cfg.Port = opts.Port
+	}
+	if opts.Host != "" {
+		cfg.Host = opts.Host
+	}
+	if opts.WorkDir != "" {
+		cfg.WorkDir = opts.WorkDir
+	}
+	if v := os.Getenv("NB_NODE_HOST"); v != "" {
+		cfg.Host = v
+	}
+	if v := os.Getenv("NB_NODE_PORT"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			cfg.Port = n
+		}
+	}
 	if cfg.Port == 0 {
 		cfg.Port = 8787
 	}
@@ -92,15 +110,15 @@ func New(opts Options) (*Core, error) {
 	}
 
 	core := &Core{
-		opts:        opts,
-		config:      cfg,
-		logger:      logger,
-		storage:     storage,
-		collector:   collector,
-		apiServer:   apiServer,
-		wssServer:   wssServer,
-		shutdown:    make(chan struct{}),
-		stopped:     make(chan struct{}),
+		opts:      opts,
+		config:    cfg,
+		logger:    logger,
+		storage:   storage,
+		collector: collector,
+		apiServer: apiServer,
+		wssServer: wssServer,
+		shutdown:  make(chan struct{}),
+		stopped:   make(chan struct{}),
 	}
 
 	return core, nil

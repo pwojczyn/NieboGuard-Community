@@ -23,6 +23,7 @@ type Server struct {
 	collectorMgr *collectors.Manager
 	logger       *slog.Logger
 	server       *http.Server
+	security     *securityConfig
 }
 
 // New creates a new API server.
@@ -31,12 +32,16 @@ func New(cfg *config.Configuration, store *storage.Storage, collMgr *collectors.
 		logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	}
 
+	if !loopbackHost(cfg.Host) && firstEnv("NNODE_AUTH_TOKEN", "NB_NODE_AUTH_TOKEN") == "" {
+		return nil, fmt.Errorf("refusing non-loopback host %q without NNODE_AUTH_TOKEN", cfg.Host)
+	}
 	router := mux.NewRouter()
 	s := &Server{
 		cfg:          cfg,
 		storage:      store,
 		collectorMgr: collMgr,
 		logger:       logger,
+		security:     newSecurityConfig(),
 		server: &http.Server{
 			Addr:    fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 			Handler: router,
@@ -45,6 +50,7 @@ func New(cfg *config.Configuration, store *storage.Storage, collMgr *collectors.
 
 	// Setup routes
 	s.setupRoutes(router)
+	router.Use(s.securityMiddleware)
 
 	return s, nil
 }
@@ -177,9 +183,9 @@ func (s *Server) EventsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"events":  events,
-		"total":   len(events),
-		"limit":   limit,
+		"events": events,
+		"total":  len(events),
+		"limit":  limit,
 	})
 }
 
@@ -205,11 +211,11 @@ func (s *Server) StatsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stats := map[string]interface{}{
-		"uptime":         "0h 0m",
-		"sources":        len(s.collectorMgr.GetSources()),
-		"objects":        0,
-		"connections":    0,
-		"version":        "0.1.0",
+		"uptime":      "0h 0m",
+		"sources":     len(s.collectorMgr.GetSources()),
+		"objects":     0,
+		"connections": 0,
+		"version":     "0.1.0",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
