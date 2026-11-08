@@ -37,16 +37,16 @@ func (a *ADSBJSONAdapter) Fetch() ([]AircraftRecord, error) {
 	var records []AircraftRecord
 	for _, raw := range data.Aircraft {
 		var a struct {
-			Hex       string  `json:"hex"`
-			Flight    string  `json:"flight"`
-			Lat       float64 `json:"lat"`
-			Lon       float64 `json:"lon"`
-			AltBaro   int     `json:"alt_baro"`
-			GS        float64 `json:"gs"`
-			Track     float64 `json:"track"`
-			Seen      float64 `json:"seen"`
-			Military  bool    `json:"military"`
-			Category  string  `json:"category"`
+			Hex      string  `json:"hex"`
+			Flight   string  `json:"flight"`
+			Lat      float64 `json:"lat"`
+			Lon      float64 `json:"lon"`
+			AltBaro  int     `json:"alt_baro"`
+			GS       float64 `json:"gs"`
+			Track    float64 `json:"track"`
+			Seen     float64 `json:"seen"`
+			Military bool    `json:"military"`
+			Category string  `json:"category"`
 		}
 		if err := json.Unmarshal(raw, &a); err != nil {
 			continue

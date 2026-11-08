@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/pwojczyn/NieboGuard-Community/node/internal/storage"
 	"github.com/pwojczyn/NieboGuard-Community/node/pkg/config"
@@ -19,20 +20,20 @@ type Collector interface {
 
 // SourceInfo provides metadata about a source.
 type SourceInfo struct {
-	ID        string `json:"id"`
-	Type      string `json:"type"`
-	Name      string `json:"name"`
-	URL       string `json:"url"`
-	Status    string `json:"status"`
-	License   string `json:"license"`
-	Count     int    `json:"count"`
+	ID      string `json:"id"`
+	Type    string `json:"type"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	Status  string `json:"status"`
+	License string `json:"license"`
+	Count   int    `json:"count"`
 }
 
 // SourceStatus provides runtime status.
 type SourceStatus struct {
-	Active    bool   `json:"active"`
-	LastFetch string `json:"last_fetch"`
-	Records   int    `json:"records"`
+	Active    bool     `json:"active"`
+	LastFetch string   `json:"last_fetch"`
+	Records   int      `json:"records"`
 	Errors    []string `json:"errors"`
 }
 
@@ -60,8 +61,22 @@ func NewManager(cfg *config.Configuration, store *storage.Storage, logger *slog.
 		sources: make(map[string]Collector),
 	}
 
-	// Initialize default sources
-	m.initDefaultSources()
+	// Configured sources are authoritative when present. Empty configuration
+	// preserves the original built-in source list.
+	if len(cfg.Sources) > 0 {
+		m.sources = make(map[string]Collector)
+		for _, source := range cfg.Sources {
+			if !source.Enabled || strings.TrimSpace(source.ID) == "" {
+				continue
+			}
+			if source.Type == "" {
+				source.Type = "adsb_json"
+			}
+			m.sources[source.ID] = newPollingSource(source, store, logger)
+		}
+	} else {
+		m.initDefaultSources()
+	}
 
 	return m, nil
 }
@@ -69,20 +84,20 @@ func NewManager(cfg *config.Configuration, store *storage.Storage, logger *slog.
 // initDefaultSources initializes built-in collectors.
 func (m *Manager) initDefaultSources() {
 	m.sources["local_adsb"] = &localADSbSource{
-		name:    "Local ADS-B",
-		logger:  m.logger,
-		store:   m.store,
+		name:   "Local ADS-B",
+		logger: m.logger,
+		store:  m.store,
 	}
 
 	m.sources["http_json"] = &httpJSONSource{
-		name:    "HTTP JSON Polling",
-		logger:  m.logger,
-		store:   m.store,
+		name:   "HTTP JSON Polling",
+		logger: m.logger,
+		store:  m.store,
 	}
 
 	m.sources["rss_atom"] = &rssAtomSource{
-		name:    "RSS/Atom Feed",
-		logger:  m.logger,
+		name:   "RSS/Atom Feed",
+		logger: m.logger,
 	}
 }
 
@@ -150,9 +165,9 @@ func (l *localADSbSource) Stop() error {
 
 func (l *localADSbSource) Status() SourceStatus {
 	return SourceStatus{
-		Active: true,
+		Active:    true,
 		LastFetch: "now",
-		Records: 0,
+		Records:   0,
 	}
 }
 
@@ -168,9 +183,9 @@ func (l *localADSbSource) GetSource() SourceInfo {
 
 // httpJSONSource represents an HTTP JSON adapter (stub for P0).
 type httpJSONSource struct {
-	name    string
-	logger  *slog.Logger
-	store   *storage.Storage
+	name   string
+	logger *slog.Logger
+	store  *storage.Storage
 }
 
 func (h *httpJSONSource) Start() error {
@@ -185,9 +200,9 @@ func (h *httpJSONSource) Stop() error {
 
 func (h *httpJSONSource) Status() SourceStatus {
 	return SourceStatus{
-		Active: true,
+		Active:    true,
 		LastFetch: "now",
-		Records: 0,
+		Records:   0,
 	}
 }
 
@@ -219,9 +234,9 @@ func (r *rssAtomSource) Stop() error {
 
 func (r *rssAtomSource) Status() SourceStatus {
 	return SourceStatus{
-		Active: true,
+		Active:    true,
 		LastFetch: "now",
-		Records: 0,
+		Records:   0,
 	}
 }
 

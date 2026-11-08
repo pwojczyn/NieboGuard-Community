@@ -9,11 +9,22 @@ import (
 )
 
 // Configuration represents the application configuration.
+// SourceConfig describes a local observation source.
+type SourceConfig struct {
+	ID              string `yaml:"id" json:"id"`
+	Type            string `yaml:"type" json:"type"`
+	Name            string `yaml:"name" json:"name"`
+	URL             string `yaml:"url" json:"url"`
+	IntervalSeconds int    `yaml:"interval_seconds" json:"interval_seconds"`
+	Enabled         bool   `yaml:"enabled" json:"enabled"`
+}
+
 type Configuration struct {
-	Port     int    `yaml:"port"`
-	Host     string `yaml:"host"`
-	WorkDir  string `yaml:"workdir"`
-	Verbose  bool   `yaml:"verbose"`
+	Port    int            `yaml:"port"`
+	Host    string         `yaml:"host"`
+	WorkDir string         `yaml:"workdir"`
+	Verbose bool           `yaml:"verbose"`
+	Sources []SourceConfig `yaml:"sources"`
 }
 
 // Load loads configuration from a YAML file.
