@@ -24,9 +24,10 @@ class RepoHygieneTests(unittest.TestCase):
                 bad.append(str(rel))
         self.assertEqual(bad, [], f"forbidden files: {bad}")
 
-    def test_only_one_approved_apk(self):
+    def test_no_apk_packages(self):
+        # Owner decision 2026-11-09: compiled Android packages are withdrawn.
         apks = [p for p in ROOT.rglob('*.apk') if '.git' not in p.parts]
-        self.assertEqual([str(p.relative_to(ROOT)) for p in apks], ['releases/nieboguard-0.1.3-beta-release.apk', 'releases/nieboguard-dev-0.1.3-beta-debug.apk'])
+        self.assertEqual([str(p.relative_to(ROOT)) for p in apks], [])
 
     def test_no_symlinks(self):
         links = [str(p.relative_to(ROOT)) for p in ROOT.rglob("*") if p.is_symlink()]

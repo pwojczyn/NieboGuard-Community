@@ -88,15 +88,11 @@
 
 Real-time systems, geospatial data, AI, aviation tracking. All synthetic data clearly marked (`simulated=true`). Educational profiles only.
 
-## Android APK
+## Android APK — wycofane
 
-[`releases/`](releases/README.md) zawiera publiczną wersję beta Androida:
+Data: 2026-11-09. Wszystkie gotowe paczki Android APK/AAB oraz ich sumy
+kontrolne zostały wycofane z GitHub Releases i lokalnych katalogów. Nie ma
+obecnie publicznego linku do instalatora Androida.
 
-- `nieboguard-0.1.3-beta-release.apk` — **wersja dla użytkowników**,
-  `pl.nieboguard.app`, podpisana kluczem uploadu,
-- `nieboguard-dev-0.1.3-beta-debug.apk` — opcjonalna wersja DEV dla testerów,
-- SHA-256 w [`releases/SHA256SUMS`](releases/SHA256SUMS).
-
-To dystrybucja poza Google Play do czasu publikacji w sklepie. FCM jest
-w kliencie, ale backend jest wyłączony do testów. Wi-Fi NAN wymaga telefonu
-z Wi-Fi Aware. To nie jest oficjalny system ostrzegania.
+Źródła i historia pozostają w repozytorium; wycofanie dotyczy wyłącznie
+skompilowanych paczek. To nie jest oficjalny system ostrzegania.

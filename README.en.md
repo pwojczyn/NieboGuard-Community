@@ -39,18 +39,14 @@ node --test tests/*.test.mjs
 The JavaScript SDK has no production dependencies. The Python SDK uses only
 the standard library. The vision tool optionally requires Pillow.
 
-## Android APK
+## Android APK — withdrawn
 
-[`releases/`](releases/README.md) contains the public Android beta:
+2026-11-09: all ready Android APK/AAB packages and their checksums were
+withdrawn from GitHub Releases and local directories. There is currently no
+public Android installer link.
 
-- `nieboguard-0.1.3-beta-release.apk` — **user build**,
-  `pl.nieboguard.app`, signed with the upload key,
-- `nieboguard-dev-0.1.3-beta-debug.apk` — optional DEV build for testers,
-- SHA-256 in [`releases/SHA256SUMS`](releases/SHA256SUMS).
-
-This is an off-Play distribution until the Google Play release. FCM is present
-in the client, but the backend is disabled for testing. Wi-Fi NAN requires
-a Wi-Fi Aware phone. This is not an official warning system.
+Source code and history remain in the repository; only compiled packages were
+withdrawn. This is not an official warning system.
 
 ## Public API
 
