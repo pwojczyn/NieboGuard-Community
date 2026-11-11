@@ -61,6 +61,20 @@ const client = new FederationClient({
 await client.refresh();
 ```
 
+## Python
+
+The same transport contract is available without third-party dependencies:
+
+```python
+from nieboguard_federation import FederationClient
+
+client = FederationClient(base_url="https://api.nieboguard.pl")
+client.enroll(invite_code, name="My Node", node_type="linux")
+client.heartbeat({"queue": 0}, version="0.2.0")
+```
+
+Tests: `python -m unittest tests/test_federation_sdk_python.py -v`.
+
 ## Protocol summary
 
 ```text
