@@ -92,9 +92,15 @@ class FederationClient:
                 return json.loads(raw) if raw else None
         except urllib.error.HTTPError as exc:
             try:
-                payload = json.loads(exc.read().decode("utf-8"))
-            except Exception:
-                payload = {}
+                try:
+                    payload = json.loads(exc.read().decode("utf-8"))
+                except Exception:
+                    payload = {}
+            finally:
+                try:
+                    exc.close()
+                except Exception:
+                    pass
             if exc.code == 401 and auth and retry and self.refresh_token:
                 self.refresh()
                 return self.request(path, body, auth=auth, retry=False, method=method)
