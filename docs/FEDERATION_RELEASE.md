@@ -31,6 +31,21 @@ Private repository must keep:
 
 No workflow may publish a release or package without a human tag/approval.
 
+## Integrity manifest and SBOM
+
+Before a release review:
+
+```bash
+node tools/federation/release_manifest.mjs --check
+node tools/federation/release_manifest.mjs --sbom > federation-sdk.sbom.json
+node tools/federation/release_manifest.mjs > federation-sdk.manifest.json
+node --test tests/federation-release.test.mjs
+```
+
+The manifest contains SHA-256 for every public SDK file and keeps
+`release_authorized: false`. It is not a release approval. The generated
+files are review artifacts; do not commit them as a release without approval.
+
 ## Required checks before any public release
 
 1. `node --test tests/sdk-js.test.mjs tests/federation-sdk.test.mjs`
