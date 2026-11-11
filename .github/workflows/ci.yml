@@ -28,7 +28,7 @@ jobs:
       - name: Python tests
         run: python -m unittest discover -s tests -v
       - name: JavaScript SDK tests
-        run: node --test tests/sdk-js.test.mjs
+        run: node --test tests/sdk-js.test.mjs tests/federation-sdk.test.mjs
       - name: Example syntax checks
         run: |
           node --check examples/state_watch.mjs

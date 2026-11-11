@@ -6,6 +6,6 @@
   "description": "Read-only JavaScript client for the public NieboGuard API",
   "license": "MIT",
   "scripts": {
-    "test": "node --test ../../tests/sdk-js.test.mjs"
+    "test": "node --test ../../tests/sdk-js.test.mjs ../../tests/federation-sdk.test.mjs"
   }
 }

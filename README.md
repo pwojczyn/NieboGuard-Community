@@ -13,6 +13,7 @@
 - [Safe Neighborhood](https://nieboguard.pl/bezpieczne-miejsca/) — AED, SOR, apteki, pomoc
 - [Protocol Lab / Simulator](https://github.com/pwojczyn/NieboGuard-Community) — ASTERIX CAT021/048/062, Link 16 (edukacyjny), symulator
 - [Knowledge Base](https://github.com/pwojczyn/NieboGuard-Community/tree/main/docs/knowledge-base) — dokumentacja protokołów
+- [Federation SDK / ngf:1](docs/FEDERATION.md) — publiczny transport węzła i zasady bezpieczeństwa
 
 **Status:** v1.0.0 wydane — wszystkie 12 etapów zakończone, 17 testów przechodzi, dane syntetyczne (`simulated=true`), edukacyjne profile wojskowe.
 
